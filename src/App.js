@@ -7,6 +7,7 @@ import ProgressPage from "./pages/ProgressPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 
+import BMIPage from "./pages/BMIPage"
 import Header from "./components/Header";
 
 function App() {
