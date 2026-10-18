@@ -30,7 +30,7 @@ function ProgressPage({ changePage }) {
 
       <div className="dashboard-grid">
 
-        <div className="dashboard-box">
+        {/* <div className="dashboard-box">
 
           <span>⚖️</span>
 
@@ -42,7 +42,7 @@ function ProgressPage({ changePage }) {
 
           <button>Zobacz wagę</button>
 
-        </div>
+        </div> */}
 
 
         <div className="dashboard-box">
