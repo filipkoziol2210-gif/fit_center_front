@@ -36,6 +36,10 @@ function App() {
         <HomePage changePage={changePage} />
       )}
 
+      {page === "bmi" && (
+        <BMIPage changePage={changePage} />
+      )}
+
       {page === "diet" && (
         <DietPage changePage={changePage} />
       )}

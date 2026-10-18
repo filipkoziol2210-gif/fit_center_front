@@ -73,6 +73,22 @@ function ProgressPage({ changePage }) {
           <button>Zobacz wykresy</button>
 
         </div>
+        
+<div className="dashboard-box">
+
+  <span>⚖️</span>
+
+  <h3>Kalkulator BMI</h3>
+
+  <p>
+    Oblicz wskaźnik BMI na podstawie wzrostu i wagi.
+  </p>
+
+  <button onClick={() => changePage("bmi")}>
+    Oblicz BMI
+  </button>
+
+</div>
 
       </div>
 
