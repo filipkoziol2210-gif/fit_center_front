@@ -1,7 +1,7 @@
 import { useState } from "react";
 import logo from "../ikonka.png";
 
-function LoginPage({ changePage }) {
+function LoginPage({ changePage, setLoggedInUser }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -24,6 +24,7 @@ function LoginPage({ changePage }) {
       const data = await response.json();
 
       if (response.ok && data.success) {
+        setLoggedInUser(email);
         changePage("home");
       } else {
         setError(data.error || "Błąd logowania.");
