@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 
 import DietPage from "./pages/DietPage";
@@ -14,6 +14,15 @@ function App() {
 
   const [darkMode, setDarkMode] = useState(true);
   const [page, setPage] = useState("home");
+  const [users, setUsers] = useState([]);
+
+  useEffect(() => {
+    const apiUrl = import.meta.env.VITE_API_URL || "https://fit-center-u3un.onrender.com";
+    fetch(`${apiUrl}/api/users/`)
+      .then((res) => res.json())
+      .then((data) => setUsers(data.users || []))
+      .catch((err) => console.error(err));
+  }, []);
 
   function changeTheme(mode) {
     setDarkMode(mode === "dark");
@@ -54,7 +63,7 @@ function App() {
       )}
 
       {page === "login" && (
-        <LoginPage changePage={changePage} />
+        <LoginPage changePage={changePage} users={users} />
       )}
 
       {page === "register" && (
