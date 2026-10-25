@@ -15,6 +15,7 @@ function App() {
   const [darkMode, setDarkMode] = useState(true);
   const [page, setPage] = useState("home");
   const [users, setUsers] = useState([]);
+  const [loggedInUser, setLoggedInUser] = useState(null);
 
   useEffect(() => {
     const apiUrl = import.meta.env.VITE_API_URL || "https://fit-center-u3un.onrender.com";
@@ -33,6 +34,11 @@ function App() {
     window.scrollTo(0, 0);
   }
 
+  function handleLogout() {
+    setLoggedInUser(null);
+    setPage("home");
+  }
+
   return (
     <div className={darkMode ? "app dark" : "app light"}>
 
@@ -43,7 +49,7 @@ function App() {
       />
 
       {page === "home" && (
-        <HomePage changePage={changePage} />
+        <HomePage changePage={changePage} loggedInUser={loggedInUser} handleLogout={handleLogout} />
       )}
 
       {page === "bmi" && (
@@ -63,7 +69,7 @@ function App() {
       )}
 
       {page === "login" && (
-        <LoginPage changePage={changePage} users={users} />
+        <LoginPage changePage={changePage} users={users} setLoggedInUser={setLoggedInUser} />
       )}
 
       {page === "register" && (
@@ -79,7 +85,7 @@ function App() {
    STRONA GŁÓWNA
    ========================= */
 
-function HomePage({ changePage }) {
+function HomePage({ changePage, loggedInUser, handleLogout }) {
 
   return (
     <>
@@ -168,13 +174,26 @@ function HomePage({ changePage }) {
 
       {/* LOGOWANIE */}
 
-      <button
-        className="login"
-        onClick={() => changePage("login")}
-      >
-        👤
-        <span>Zaloguj</span>
-      </button>
+      {loggedInUser ? (
+        <div style={{ position: "fixed", bottom: "20px", left: "20px", display: "flex", alignItems: "center", gap: "10px", zIndex: 1000 }}>
+          <span>Witaj, {loggedInUser}</span>
+          <button
+            className="login"
+            onClick={handleLogout}
+            style={{ position: "static" }}
+          >
+            <span>Wyloguj</span>
+          </button>
+        </div>
+      ) : (
+        <button
+          className="login"
+          onClick={() => changePage("login")}
+        >
+          👤
+          <span>Zaloguj</span>
+        </button>
+      )}
 
     </>
   );
