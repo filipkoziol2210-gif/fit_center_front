@@ -1,18 +1,35 @@
 import { useState } from "react";
 import logo from "../ikonka.png";
 
-function LoginPage({ users = [], changePage }) {
+function LoginPage({ changePage }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  function handleLogin(e) {
+  async function handleLogin(e) {
     e.preventDefault();
-    const found = users.find((u) => u.email === email);
-    if (found) {
-      changePage("home");
-    } else {
-      setError("Nie znaleziono użytkownika o podanym adresie e-mail.");
+    setError("");
+
+    const apiUrl = import.meta.env.VITE_API_URL || "https://fit-center-u3un.onrender.com";
+
+    try {
+      const response = await fetch(`${apiUrl}/api/login/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        changePage("home");
+      } else {
+        setError(data.error || "Błąd logowania.");
+      }
+    } catch (err) {
+      setError("Błąd połączenia z serwerem.");
     }
   }
 
