@@ -12,6 +12,11 @@ export default function MealsPage({ changePage }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [mealType, setMealType] = useState("Śniadanie");
+  const [calories, setCalories] = useState("0");
+  const [protein, setProtein] = useState("0");
+  const [carbs, setCarbs] = useState("0");
+  const [fat, setFat] = useState("0");
+  const [weight, setWeight] = useState("100");
   const [meals, setMeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -61,6 +66,11 @@ export default function MealsPage({ changePage }) {
             name: trimmedName,
             description: trimmedDescription,
             type: mealType,
+            calories: Number(calories),
+            protein: Number(protein),
+            carbs: Number(carbs),
+            fat: Number(fat),
+            weight_grams: Number(weight),
           }),
         }
       );
@@ -80,6 +90,11 @@ export default function MealsPage({ changePage }) {
       ]);
       setName("");
       setDescription("");
+      setCalories("0");
+      setProtein("0");
+      setCarbs("0");
+      setFat("0");
+      setWeight("100");
     } catch (err) {
       setError(err.message || "Nie udało się zapisać posiłku.");
     } finally {
@@ -172,6 +187,24 @@ export default function MealsPage({ changePage }) {
                 rows={4}
                 maxLength={1000}
               />
+
+              <label htmlFor="meal-calories">Kalorie na 100 g</label>
+              <input id="meal-calories" type="number" min="0" step="0.1" value={calories} onChange={(event) => setCalories(event.target.value)} required />
+
+              <label htmlFor="meal-protein">Białko na 100 g</label>
+              <input id="meal-protein" type="number" min="0" step="0.1" value={protein} onChange={(event) => setProtein(event.target.value)} required />
+
+              <label htmlFor="meal-carbs">Węglowodany na 100 g</label>
+              <input id="meal-carbs" type="number" min="0" step="0.1" value={carbs} onChange={(event) => setCarbs(event.target.value)} required />
+
+              <label htmlFor="meal-fat">Tłuszcze na 100 g</label>
+              <input id="meal-fat" type="number" min="0" step="0.1" value={fat} onChange={(event) => setFat(event.target.value)} required />
+
+              <label htmlFor="meal-weight">Spożyta ilość</label>
+              <div className="nutrition-input-with-unit">
+                <input id="meal-weight" type="number" min="1" step="1" value={weight} onChange={(event) => setWeight(event.target.value)} required />
+                <span>g</span>
+              </div>
 
               <button className="nutrition-primary-button" type="submit" disabled={saving}>
                 {saving ? "Zapisywanie..." : <>Zapisz posiłek <span>＋</span></>}
