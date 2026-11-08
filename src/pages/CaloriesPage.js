@@ -1,52 +1,95 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { apiJson, jsonBody } from "../api";
 
 export default function CaloriesPage({ changePage }) {
   const [product, setProduct] = useState("");
   const [calories, setCalories] = useState("");
   const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
-  const totalCalories = items.reduce(
-    (sum, item) => sum + item.calories,
-    0
-  );
+  useEffect(() => {
+    let cancelled = false;
 
-  function addProduct(e) {
-    e.preventDefault();
+    async function loadItems() {
+      setLoading(true);
+      setError("");
+      try {
+        const data = await apiJson("/api/calories/");
+        if (!cancelled) setItems(Array.isArray(data.items) ? data.items : []);
+      } catch (err) {
+        if (!cancelled) setError(err.message || "Nie udało się pobrać produktów.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
 
-    if (!product.trim() || calories === "" || Number(calories) < 0) {
+    loadItems();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const totalCalories = items.reduce((sum, item) => sum + (Number(item.calories) || 0), 0);
+
+  async function addProduct(event) {
+    event.preventDefault();
+    const trimmedProduct = product.trim();
+    const calorieValue = Number(calories);
+
+    if (!trimmedProduct || calories === "" || !Number.isFinite(calorieValue) || calorieValue < 0) {
+      setError("Podaj nazwę produktu i poprawną, nieujemną wartość kcal na 100 g.");
       return;
     }
 
-    setItems([
-      ...items,
-      {
-        id: Date.now(),
-        name: product.trim(),
-        calories: Number(calories),
-      },
-    ]);
+    setSaving(true);
+    setError("");
 
-    setProduct("");
-    setCalories("");
+    try {
+      const data = await apiJson("/api/calories/", {
+        method: "POST",
+        ...jsonBody({ name: trimmedProduct, calories: calorieValue }),
+      });
+
+      if (!data.success || data.id == null) {
+        throw new Error(data.error || "Serwer nie potwierdził zapisu produktu.");
+      }
+
+      setItems((previous) => [
+        ...previous,
+        { id: data.id, name: trimmedProduct, calories: calorieValue },
+      ]);
+      setProduct("");
+      setCalories("");
+    } catch (err) {
+      setError(err.message || "Nie udało się dodać produktu.");
+    } finally {
+      setSaving(false);
+    }
   }
 
-  function removeProduct(id) {
-    setItems(items.filter((item) => item.id !== id));
+  async function removeProduct(id) {
+    setError("");
+    try {
+      await apiJson(`/api/calories/?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+      setItems((previous) => previous.filter((item) => item.id !== id));
+    } catch (err) {
+      setError(err.message || "Nie udało się usunąć produktu.");
+    }
   }
 
   return (
     <main className="nutrition-page">
       <div className="nutrition-container">
-        <button
-          className="nutrition-back-link"
-          onClick={() => changePage("diet")}
-        >
+        <button className="nutrition-back-link" onClick={() => changePage("diet")}>
           ← Powrót do diety
         </button>
 
         <header className="nutrition-heading">
           <div className="nutrition-heading-icon calories-icon">🔥</div>
-
           <div>
             <h1>Bilans kalorii</h1>
             <p>Dodawaj produkty i sprawdzaj ich wartość energetyczną.</p>
@@ -57,14 +100,15 @@ export default function CaloriesPage({ changePage }) {
           <div>
             <span className="nutrition-eyebrow">PODSUMOWANIE</span>
             <h2>Łączna wartość energetyczna</h2>
-            <p>Wynik na podstawie produktów dodanych do listy.</p>
+            <p>Suma kalorii zapisanych produktów.</p>
           </div>
-
           <div className="calories-summary-value">
-            <strong>{totalCalories.toLocaleString("pl-PL")}</strong>
+            <strong>{Math.round(totalCalories).toLocaleString("pl-PL")}</strong>
             <span>kcal</span>
           </div>
         </section>
+
+        {error && <p className="nutrition-error" role="alert">{error}</p>}
 
         <section className="calories-layout">
           <div className="nutrition-panel calories-form-panel">
@@ -72,7 +116,7 @@ export default function CaloriesPage({ changePage }) {
               <span className="panel-icon">＋</span>
               <div>
                 <h2>Dodaj produkt</h2>
-                <p>Uzupełnij informacje o produkcie.</p>
+                <p>Wartość energetyczna podawana na 100 g produktu.</p>
               </div>
             </div>
 
@@ -83,27 +127,28 @@ export default function CaloriesPage({ changePage }) {
                 type="text"
                 placeholder="Np. Owsianka"
                 value={product}
-                onChange={(e) => setProduct(e.target.value)}
+                onChange={(event) => setProduct(event.target.value)}
+                maxLength={200}
                 required
               />
 
-              <label htmlFor="product-calories">Wartość energetyczna</label>
+              <label htmlFor="product-calories">Kalorie na 100 g</label>
               <div className="nutrition-input-with-unit">
                 <input
                   id="product-calories"
                   type="number"
                   min="0"
-                  step="1"
+                  step="0.1"
                   placeholder="Np. 250"
                   value={calories}
-                  onChange={(e) => setCalories(e.target.value)}
+                  onChange={(event) => setCalories(event.target.value)}
                   required
                 />
                 <span>kcal</span>
               </div>
 
-              <button className="nutrition-primary-button" type="submit">
-                Dodaj do listy <span>＋</span>
+              <button className="nutrition-primary-button" type="submit" disabled={saving}>
+                {saving ? "Dodawanie..." : <>Dodaj do listy <span>＋</span></>}
               </button>
             </form>
           </div>
@@ -113,12 +158,14 @@ export default function CaloriesPage({ changePage }) {
               <span className="panel-icon">☷</span>
               <div>
                 <h2>Dodane produkty</h2>
-                <p>Lista produktów w bieżącym zestawieniu.</p>
+                <p>Produkty zapisane w dzienniku.</p>
               </div>
               <span className="nutrition-count">{items.length}</span>
             </div>
 
-            {items.length === 0 ? (
+            {loading ? (
+              <p role="status">Ładowanie produktów...</p>
+            ) : items.length === 0 ? (
               <div className="nutrition-empty-state">
                 <span>🍎</span>
                 <h3>Lista jest jeszcze pusta</h3>
@@ -129,18 +176,16 @@ export default function CaloriesPage({ changePage }) {
                 {items.map((item) => (
                   <div className="calories-product-item" key={item.id}>
                     <div className="product-avatar">🍽️</div>
-
                     <div className="product-details">
                       <strong>{item.name}</strong>
                       <span>Produkt spożywczy</span>
                     </div>
-
                     <strong className="product-calories">
-                      {item.calories} kcal
+                      {Math.round(Number(item.calories) || 0)} kcal
                     </strong>
-
                     <button
                       className="nutrition-delete-button"
+                      type="button"
                       onClick={() => removeProduct(item.id)}
                       aria-label={`Usuń ${item.name}`}
                       title="Usuń produkt"

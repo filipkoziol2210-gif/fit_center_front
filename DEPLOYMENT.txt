@@ -1,0 +1,11 @@
+FRONTEND – Fit Center
+
+Ten katalog jest kompletną zawartością repozytorium frontendowego.
+
+- Vercel Root Directory: katalog główny tego projektu (tam, gdzie jest package.json).
+- Build command: npm run build (Create React App).
+- Output directory: build.
+- API: względny adres /api/* przekazywany przez vercel.json do https://fit-center-u3un.onrender.com.
+- W lokalnym `npm start` pole `proxy` z package.json przekazuje /api/* do Render.
+
+Nie ustawiaj VITE_API_URL ani REACT_APP_API_BASE_URL na adres Render. API ma korzystać z proxy same-origin.

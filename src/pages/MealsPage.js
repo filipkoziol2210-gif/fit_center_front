@@ -1,54 +1,113 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { apiJson, jsonBody } from "../api";
+
+const categories = [
+  { name: "Śniadanie", icon: "🌅" },
+  { name: "Obiad", icon: "🍲" },
+  { name: "Kolacja", icon: "🌙" },
+  { name: "Przekąski", icon: "🍎" },
+];
 
 export default function MealsPage({ changePage }) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [mealType, setMealType] = useState("Śniadanie");
   const [meals, setMeals] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
-  const categories = [
-    { name: "Śniadanie", icon: "🌅" },
-    { name: "Obiad", icon: "🍲" },
-    { name: "Kolacja", icon: "🌙" },
-    { name: "Przekąski", icon: "🍎" },
-  ];
+  useEffect(() => {
+    let cancelled = false;
 
-  function addMeal(e) {
-    e.preventDefault();
+    async function loadMeals() {
+      setLoading(true);
+      setError("");
+      try {
+        const data = await apiJson("/api/meals/");
+        if (!cancelled) setMeals(Array.isArray(data.meals) ? data.meals : []);
+      } catch (err) {
+        if (!cancelled) setError(err.message || "Nie udało się pobrać posiłków.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
 
-    if (!name.trim()) return;
+    loadMeals();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
-    setMeals([
-      ...meals,
-      {
-        id: Date.now(),
-        name: name.trim(),
-        description: description.trim(),
-        type: mealType,
-      },
-    ]);
+  async function addMeal(event) {
+    event.preventDefault();
+    const trimmedName = name.trim();
+    const trimmedDescription = description.trim();
 
-    setName("");
-    setDescription("");
+    if (!trimmedName) {
+      setError("Podaj nazwę posiłku.");
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+
+    try {
+      const data = await apiJson(
+        "/api/meals/",
+        {
+          method: "POST",
+          ...jsonBody({
+            name: trimmedName,
+            description: trimmedDescription,
+            type: mealType,
+          }),
+        }
+      );
+
+      if (!data.success || data.id == null) {
+        throw new Error(data.error || "Serwer nie potwierdził zapisu posiłku.");
+      }
+
+      setMeals((previous) => [
+        ...previous,
+        {
+          id: data.id,
+          name: trimmedName,
+          description: trimmedDescription,
+          type: mealType,
+        },
+      ]);
+      setName("");
+      setDescription("");
+    } catch (err) {
+      setError(err.message || "Nie udało się zapisać posiłku.");
+    } finally {
+      setSaving(false);
+    }
   }
 
-  function removeMeal(id) {
-    setMeals(meals.filter((meal) => meal.id !== id));
+  async function removeMeal(id) {
+    setError("");
+    try {
+      await apiJson(`/api/meals/?id=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+      setMeals((previous) => previous.filter((meal) => meal.id !== id));
+    } catch (err) {
+      setError(err.message || "Nie udało się usunąć posiłku.");
+    }
   }
 
   return (
     <main className="nutrition-page">
       <div className="nutrition-container">
-        <button
-          className="nutrition-back-link"
-          onClick={() => changePage("diet")}
-        >
+        <button className="nutrition-back-link" onClick={() => changePage("diet")}>
           ← Powrót do diety
         </button>
 
         <header className="nutrition-heading">
           <div className="nutrition-heading-icon meals-icon">🍽️</div>
-
           <div>
             <h1>Dziennik posiłków</h1>
             <p>Twórz własny dziennik i zapisuj spożywane posiłki.</p>
@@ -59,16 +118,15 @@ export default function MealsPage({ changePage }) {
           <div>
             <span className="nutrition-eyebrow">TWÓJ DZIENNIK</span>
             <h2>Codzienne posiłki</h2>
-            <p>
-              Dodawaj posiłki i przypisuj je do odpowiednich kategorii.
-            </p>
+            <p>Dodawaj posiłki i przypisuj je do odpowiednich kategorii.</p>
           </div>
-
           <div className="meals-intro-stat">
             <strong>{meals.length}</strong>
             <span>zapisanych posiłków</span>
           </div>
         </section>
+
+        {error && <p className="nutrition-error" role="alert">{error}</p>}
 
         <section className="meals-layout">
           <div className="nutrition-panel meals-form-panel">
@@ -87,7 +145,8 @@ export default function MealsPage({ changePage }) {
                 type="text"
                 placeholder="Np. Kanapki z jajkiem"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(event) => setName(event.target.value)}
+                maxLength={200}
                 required
               />
 
@@ -95,7 +154,7 @@ export default function MealsPage({ changePage }) {
               <select
                 id="meal-type"
                 value={mealType}
-                onChange={(e) => setMealType(e.target.value)}
+                onChange={(event) => setMealType(event.target.value)}
               >
                 {categories.map((category) => (
                   <option key={category.name} value={category.name}>
@@ -109,65 +168,61 @@ export default function MealsPage({ changePage }) {
                 id="meal-description"
                 placeholder="Dodaj krótki opis posiłku..."
                 value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                rows="4"
+                onChange={(event) => setDescription(event.target.value)}
+                rows={4}
+                maxLength={1000}
               />
 
-              <button className="nutrition-primary-button" type="submit">
-                Zapisz posiłek <span>＋</span>
+              <button className="nutrition-primary-button" type="submit" disabled={saving}>
+                {saving ? "Zapisywanie..." : <>Zapisz posiłek <span>＋</span></>}
               </button>
             </form>
           </div>
 
           <div className="meals-board">
-            {categories.map((category) => {
-              const categoryMeals = meals.filter(
-                (meal) => meal.type === category.name
-              );
+            {loading ? (
+              <p role="status">Ładowanie posiłków...</p>
+            ) : (
+              categories.map((category) => {
+                const categoryMeals = meals.filter((meal) => meal.type === category.name);
 
-              return (
-                <section className="meal-category-panel" key={category.name}>
-                  <div className="meal-category-heading">
-                    <div className="meal-category-title">
-                      <span>{category.icon}</span>
-                      <h2>{category.name}</h2>
+                return (
+                  <section className="meal-category-panel" key={category.name}>
+                    <div className="meal-category-heading">
+                      <div className="meal-category-title">
+                        <span>{category.icon}</span>
+                        <h2>{category.name}</h2>
+                      </div>
+                      <span className="nutrition-count">{categoryMeals.length}</span>
                     </div>
 
-                    <span className="nutrition-count">
-                      {categoryMeals.length}
-                    </span>
-                  </div>
-
-                  {categoryMeals.length === 0 ? (
-                    <p className="meal-category-empty">
-                      Brak dodanych posiłków
-                    </p>
-                  ) : (
-                    <div className="meal-category-list">
-                      {categoryMeals.map((meal) => (
-                        <article className="meal-entry" key={meal.id}>
-                          <div className="meal-entry-content">
-                            <strong>{meal.name}</strong>
-                            {meal.description && (
-                              <p>{meal.description}</p>
-                            )}
-                          </div>
-
-                          <button
-                            className="nutrition-delete-button"
-                            onClick={() => removeMeal(meal.id)}
-                            aria-label={`Usuń ${meal.name}`}
-                            title="Usuń posiłek"
-                          >
-                            ×
-                          </button>
-                        </article>
-                      ))}
-                    </div>
-                  )}
-                </section>
-              );
-            })}
+                    {categoryMeals.length === 0 ? (
+                      <p className="meal-category-empty">Brak dodanych posiłków</p>
+                    ) : (
+                      <div className="meal-category-list">
+                        {categoryMeals.map((meal) => (
+                          <article className="meal-entry" key={meal.id}>
+                            <div className="meal-entry-content">
+                              <strong>{meal.name}</strong>
+                              {meal.description && <p>{meal.description}</p>}
+                            </div>
+                            <button
+                              className="nutrition-delete-button"
+                              type="button"
+                              onClick={() => removeMeal(meal.id)}
+                              aria-label={`Usuń ${meal.name}`}
+                              title="Usuń posiłek"
+                            >
+                              ×
+                            </button>
+                          </article>
+                        ))}
+                      </div>
+                    )}
+                  </section>
+                );
+              })
+            )}
           </div>
         </section>
       </div>

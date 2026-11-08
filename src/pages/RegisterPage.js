@@ -1,182 +1,130 @@
 import { useState } from "react";
 import logo from "../ikonka.png";
+import { apiJson, jsonBody } from "../api";
 
-function RegisterPage({ changePage }) {
-
-  const [name, setName] = useState("");
+function RegisterPage({ changePage, setLoggedInUser }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-
-  async function register(e) {
-
-    e.preventDefault();
+  async function register(event) {
+    event.preventDefault();
+    setError("");
 
     if (password !== confirmPassword) {
-      setError("Hasła nie są takie same");
+      setError("Hasła nie są takie same.");
+      return;
+    }
+    if (password.length < 8) {
+      setError("Hasło musi mieć co najmniej 8 znaków.");
       return;
     }
 
-    setError("");
-
-    const apiUrl = import.meta.env.VITE_API_URL || "https://fit-center-u3un.onrender.com";
+    setIsSubmitting(true);
+    const normalizedEmail = email.trim().toLowerCase();
 
     try {
-      const response = await fetch(`${apiUrl}/api/register/`, {
+      const data = await apiJson("/api/register/", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, email, password }),
+        ...jsonBody({ email: normalizedEmail, password }),
       });
 
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        changePage("login");
-      } else {
-        setError(data.error || "Błąd rejestracji.");
+      if (!data.success) {
+        throw new Error(data.error || "Nie udało się utworzyć konta.");
       }
+
+      // Backend tworzy sesję od razu po rejestracji.
+      setLoggedInUser(normalizedEmail);
+      changePage("home");
     } catch (err) {
-      setError("Błąd połączenia z serwerem.");
+      console.error("REGISTER ERROR:", err);
+      setError(err.message || "Nie udało się połączyć z serwerem.");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
-
   return (
     <main className="login-page">
-
       <div className="login-card">
-
-        <img
-          src={logo}
-          alt="Fit Center logo"
-          className="login-logo"
-        />
+        <img src={logo} alt="Fit Center logo" className="login-logo" />
 
         <h1>Utwórz konto</h1>
-
         <p className="login-description">
           Załóż konto i zacznij korzystać z Fit Center
         </p>
 
-
         <form onSubmit={register}>
-
           <div className="input-group">
-
-            <label>Imię</label>
-
+            <label htmlFor="register-email">Adres e-mail</label>
             <input
-              type="text"
-              placeholder="Wpisz swoje imię"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-
-          </div>
-
-
-          <div className="input-group">
-
-            <label>Adres e-mail</label>
-
-            <input
+              id="register-email"
               type="email"
               placeholder="twoj@email.pl"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(event) => setEmail(event.target.value)}
+              autoComplete="email"
               required
             />
-
           </div>
 
-
           <div className="input-group">
-
-            <label>Hasło</label>
-
+            <label htmlFor="register-password">Hasło</label>
             <input
+              id="register-password"
               type="password"
-              placeholder="Wpisz hasło"
+              placeholder="Minimum 8 znaków"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(event) => setPassword(event.target.value)}
+              autoComplete="new-password"
+              minLength={8}
               required
             />
-
           </div>
 
-
           <div className="input-group">
-
-            <label>Powtórz hasło</label>
-
+            <label htmlFor="register-confirm-password">Powtórz hasło</label>
             <input
+              id="register-confirm-password"
               type="password"
               placeholder="Powtórz hasło"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={(event) => setConfirmPassword(event.target.value)}
+              autoComplete="new-password"
+              minLength={8}
               required
             />
-
           </div>
 
-
           {error && (
-            <p className="register-error" style={{ color: "red", marginBottom: "1rem" }}>
+            <p className="register-error" role="alert" style={{ color: "red", marginBottom: "1rem" }}>
               {error}
             </p>
           )}
 
-
           <label className="terms">
-
             <input type="checkbox" required />
-
-            <span>
-              Akceptuję regulamin Fit Center
-            </span>
-
+            <span>Akceptuję regulamin Fit Center</span>
           </label>
 
-
-          <button
-            type="submit"
-            className="login-submit"
-          >
-            Utwórz konto
+          <button type="submit" className="login-submit" disabled={isSubmitting}>
+            {isSubmitting ? "Tworzenie konta..." : "Utwórz konto"}
           </button>
-
         </form>
 
-
         <p className="register-text">
-
-          Masz już konto?
-
-          <button
-            type="button"
-            onClick={() => changePage("login")}
-          >
+          Masz już konto?{" "}
+          <button type="button" onClick={() => changePage("login")}>
             Zaloguj się
           </button>
-
         </p>
 
-
-        <button
-          type="button"
-          className="back-button"
-          onClick={() => changePage("home")}
-        >
+        <button type="button" className="back-button" onClick={() => changePage("home")}>
           ← Powrót do strony głównej
         </button>
-
       </div>
-
     </main>
   );
 }
