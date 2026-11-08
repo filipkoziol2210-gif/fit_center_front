@@ -6,6 +6,9 @@ import TrainingPage from "./pages/TrainingPage";
 import ProgressPage from "./pages/ProgressPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import CaloriesPage from "./pages/CaloriesPage";
+import MealsPage from "./pages/MealsPage";
+import MacrosPage from "./pages/MacrosPage";
 
 import BMIPage from "./pages/BMIPage"
 import Header from "./components/Header";
