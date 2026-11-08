@@ -1,18 +1,16 @@
 import { useState } from "react";
 
-function MealsPage({ changePage }) {
-
+export default function MealsPage({ changePage }) {
   const [name, setName] = useState("");
-  const [mealType, setMealType] = useState("Śniadanie");
   const [description, setDescription] = useState("");
-
+  const [mealType, setMealType] = useState("Śniadanie");
   const [meals, setMeals] = useState([]);
 
   const categories = [
     { name: "Śniadanie", icon: "🌅" },
     { name: "Obiad", icon: "🍲" },
     { name: "Kolacja", icon: "🌙" },
-    { name: "Przekąski", icon: "🍎" }
+    { name: "Przekąski", icon: "🍎" },
   ];
 
   function addMeal(e) {
@@ -24,10 +22,10 @@ function MealsPage({ changePage }) {
       ...meals,
       {
         id: Date.now(),
-        name,
-        description,
-        type: mealType
-      }
+        name: name.trim(),
+        description: description.trim(),
+        type: mealType,
+      },
     ]);
 
     setName("");
@@ -35,153 +33,144 @@ function MealsPage({ changePage }) {
   }
 
   function removeMeal(id) {
-    setMeals(meals.filter(meal => meal.id !== id));
+    setMeals(meals.filter((meal) => meal.id !== id));
   }
 
   return (
-    <main className="food-subpage meals-page">
+    <main className="nutrition-page">
+      <div className="nutrition-container">
+        <button
+          className="nutrition-back-link"
+          onClick={() => changePage("diet")}
+        >
+          ← Powrót do diety
+        </button>
 
-      <button
-        className="page-back"
-        onClick={() => changePage("diet")}
-      >
-        ← Powrót do diety
-      </button>
+        <header className="nutrition-heading">
+          <div className="nutrition-heading-icon meals-icon">🍽️</div>
 
-      <div className="meals-header">
-        <span className="diet-eyebrow">TWÓJ DZIENNIK ŻYWIENIA</span>
-        <h1>Plan posiłków</h1>
-        <p>
-          Zapisuj posiłki i organizuj swój dziennik żywienia.
-        </p>
-      </div>
+          <div>
+            <h1>Dziennik posiłków</h1>
+            <p>Twórz własny dziennik i zapisuj spożywane posiłki.</p>
+          </div>
+        </header>
 
-      <div className="meals-layout">
+        <section className="meals-intro">
+          <div>
+            <span className="nutrition-eyebrow">TWÓJ DZIENNIK</span>
+            <h2>Codzienne posiłki</h2>
+            <p>
+              Dodawaj posiłki i przypisuj je do odpowiednich kategorii.
+            </p>
+          </div>
 
-        <section className="meal-form-panel">
+          <div className="meals-intro-stat">
+            <strong>{meals.length}</strong>
+            <span>zapisanych posiłków</span>
+          </div>
+        </section>
 
-          <h2>Dodaj posiłek</h2>
-
-          <form onSubmit={addMeal}>
-
-            <div className="input-group">
-              <label>Nazwa posiłku</label>
-              <input
-                type="text"
-                placeholder="Np. Owsianka z owocami"
-                value={name}
-                onChange={e => setName(e.target.value)}
-                required
-              />
+        <section className="meals-layout">
+          <div className="nutrition-panel meals-form-panel">
+            <div className="nutrition-panel-heading">
+              <span className="panel-icon">＋</span>
+              <div>
+                <h2>Nowy posiłek</h2>
+                <p>Dodaj pozycję do swojego dziennika.</p>
+              </div>
             </div>
 
-            <div className="input-group">
-              <label>Rodzaj posiłku</label>
+            <form className="nutrition-form" onSubmit={addMeal}>
+              <label htmlFor="meal-name">Nazwa posiłku</label>
+              <input
+                id="meal-name"
+                type="text"
+                placeholder="Np. Kanapki z jajkiem"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
 
+              <label htmlFor="meal-type">Kategoria</label>
               <select
+                id="meal-type"
                 value={mealType}
-                onChange={e => setMealType(e.target.value)}
+                onChange={(e) => setMealType(e.target.value)}
               >
-                {categories.map(category => (
-                  <option
-                    key={category.name}
-                    value={category.name}
-                  >
+                {categories.map((category) => (
+                  <option key={category.name} value={category.name}>
                     {category.name}
                   </option>
                 ))}
               </select>
-            </div>
 
-            <div className="input-group">
-              <label>Opis (opcjonalnie)</label>
+              <label htmlFor="meal-description">Opis (opcjonalnie)</label>
               <textarea
-                placeholder="Np. Płatki owsiane, mleko, banan..."
+                id="meal-description"
+                placeholder="Dodaj krótki opis posiłku..."
                 value={description}
-                onChange={e => setDescription(e.target.value)}
+                onChange={(e) => setDescription(e.target.value)}
                 rows="4"
               />
-            </div>
 
-            <button className="login-submit" type="submit">
-              + Dodaj do dziennika
-            </button>
-
-          </form>
-
-        </section>
-
-        <section className="meal-timeline">
-
-          <div className="meal-timeline-heading">
-            <h2>Twój dziennik</h2>
-            <span>{meals.length} wpisów</span>
+              <button className="nutrition-primary-button" type="submit">
+                Zapisz posiłek <span>＋</span>
+              </button>
+            </form>
           </div>
 
-          {categories.map(category => {
+          <div className="meals-board">
+            {categories.map((category) => {
+              const categoryMeals = meals.filter(
+                (meal) => meal.type === category.name
+              );
 
-            const categoryMeals = meals.filter(
-              meal => meal.type === category.name
-            );
-
-            return (
-
-              <div className="meal-category" key={category.name}>
-
-                <div className="meal-category-heading">
-                  <span>{category.icon}</span>
-                  <h3>{category.name}</h3>
-                  <span className="meal-count">
-                    {categoryMeals.length}
-                  </span>
-                </div>
-
-                {categoryMeals.length === 0 ? (
-
-                  <p className="meal-empty">
-                    Brak dodanych posiłków
-                  </p>
-
-                ) : (
-
-                  categoryMeals.map(meal => (
-
-                    <div className="meal-entry" key={meal.id}>
-
-                      <div>
-                        <strong>{meal.name}</strong>
-
-                        {meal.description && (
-                          <p>{meal.description}</p>
-                        )}
-                      </div>
-
-                      <button
-                        type="button"
-                        className="delete-food"
-                        onClick={() => removeMeal(meal.id)}
-                      >
-                        ×
-                      </button>
-
+              return (
+                <section className="meal-category-panel" key={category.name}>
+                  <div className="meal-category-heading">
+                    <div className="meal-category-title">
+                      <span>{category.icon}</span>
+                      <h2>{category.name}</h2>
                     </div>
 
-                  ))
+                    <span className="nutrition-count">
+                      {categoryMeals.length}
+                    </span>
+                  </div>
 
-                )}
+                  {categoryMeals.length === 0 ? (
+                    <p className="meal-category-empty">
+                      Brak dodanych posiłków
+                    </p>
+                  ) : (
+                    <div className="meal-category-list">
+                      {categoryMeals.map((meal) => (
+                        <article className="meal-entry" key={meal.id}>
+                          <div className="meal-entry-content">
+                            <strong>{meal.name}</strong>
+                            {meal.description && (
+                              <p>{meal.description}</p>
+                            )}
+                          </div>
 
-              </div>
-
-            );
-
-          })}
-
+                          <button
+                            className="nutrition-delete-button"
+                            onClick={() => removeMeal(meal.id)}
+                            aria-label={`Usuń ${meal.name}`}
+                            title="Usuń posiłek"
+                          >
+                            ×
+                          </button>
+                        </article>
+                      ))}
+                    </div>
+                  )}
+                </section>
+              );
+            })}
+          </div>
         </section>
-
       </div>
-
     </main>
   );
 }
-
-export default MealsPage;
