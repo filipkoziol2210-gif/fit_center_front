@@ -62,7 +62,7 @@ export default function CaloriesPage({ changePage }) {
 
       setItems((previous) => [
         ...previous,
-        { id: data.id, name: trimmedProduct, calories: Number(data.calories), protein: Number(data.protein), carbs: Number(data.carbs), fat: Number(data.fat), weight_grams: Number(weight) },
+        { id: data.id, name: trimmedProduct, calories: Number(data.calories ?? calorieValue), protein: Number(data.protein ?? 0), carbs: Number(data.carbs ?? 0), fat: Number(data.fat ?? 0), weight_grams: Number(data.weight_grams ?? 100) },
       ]);
       setProduct("");
       setCalories("");
