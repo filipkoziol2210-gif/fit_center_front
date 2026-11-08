@@ -36,5 +36,8 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "https://fit-center-u3un.onrender.com"
+  "proxy": "http://127.0.0.1:8000",
+  "engines": {
+    "node": ">=20"
+  }
 }

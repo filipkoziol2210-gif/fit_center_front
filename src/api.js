@@ -1,58 +1,35 @@
-/**
- * Wspólny klient API.
- * W przeglądarce wszystkie żądania idą pod tym samym originem (/api/...):
- * - produkcja: proxy Vercel z vercel.json -> Render
- * - lokalnie: proxy Create React App z package.json -> Render lub lokalny Django
- * Dzięki temu cookies sesji i CSRF są first-party.
- */
-
-const API_BASE_URL = ""; // Wymuszamy same-origin przez proxy Vercel/CRA.
-const SAFE_METHODS = new Set(["GET", "HEAD", "OPTIONS", "TRACE"]);
+// Produkcyjnie /api jest proxyowane przez Vercel do Django na Render.
+// Lokalnie Create React App używa pola "proxy" w package.json.
+const API_BASE = "";
 
 let csrfToken = null;
 let csrfRequest = null;
 
-function buildUrl(path) {
-  if (typeof path !== "string" || !path.startsWith("/api/")) {
-    throw new Error("Adres API musi zaczynać się od /api/.");
-  }
-  return `${API_BASE_URL}${path}`;
-}
-
-async function readResponse(response) {
-  const contentType = response.headers.get("content-type") || "";
-
-  if (contentType.includes("application/json")) {
-    try {
-      return await response.json();
-    } catch {
-      throw new Error("Serwer zwrócił niepoprawny JSON.");
-    }
-  }
-
-  const text = await response.text();
-  return { rawResponse: text };
-}
-
-async function ensureCsrfToken(forceRefresh = false) {
-  if (forceRefresh) csrfToken = null;
+async function ensureCsrfToken() {
   if (csrfToken) return csrfToken;
 
   if (!csrfRequest) {
-    csrfRequest = fetch(buildUrl("/api/csrf/"), {
+    csrfRequest = fetch(`${API_BASE}/api/csrf/`, {
       method: "GET",
-      credentials: "include",
-      headers: { Accept: "application/json" },
+      credentials: "same-origin",
       cache: "no-store",
+      headers: { Accept: "application/json" },
     })
       .then(async (response) => {
-        const data = await readResponse(response);
+        let data;
+        try {
+          data = await response.json();
+        } catch {
+          throw new Error(`Endpoint CSRF zwrócił nieprawidłową odpowiedź (${response.status}).`);
+        }
+
         if (!response.ok) {
           throw new Error(data.error || `Nie udało się pobrać CSRF (${response.status}).`);
         }
         if (!data.csrfToken) {
-          throw new Error("Backend nie zwrócił tokenu CSRF.");
+          throw new Error("Backend nie zwrócił tokenu CSRF. Sprawdź api_csrf w Django.");
         }
+
         csrfToken = data.csrfToken;
         return csrfToken;
       })
@@ -64,41 +41,49 @@ async function ensureCsrfToken(forceRefresh = false) {
   return csrfRequest;
 }
 
-export function clearCsrfToken() {
-  csrfToken = null;
-  csrfRequest = null;
-}
-
 export async function apiRequest(path, options = {}) {
+  if (typeof path !== "string" || !path.startsWith("/api/")) {
+    throw new Error("Ścieżka API musi zaczynać się od /api/.");
+  }
+
   const method = (options.method || "GET").toUpperCase();
   const headers = new Headers(options.headers || {});
 
-  if (!SAFE_METHODS.has(method)) {
+  if (!["GET", "HEAD", "OPTIONS", "TRACE"].includes(method)) {
     const token = await ensureCsrfToken();
     headers.set("X-CSRFToken", token);
   }
 
   headers.set("Accept", "application/json");
 
-  return fetch(buildUrl(path), {
+  return fetch(`${API_BASE}${path}`, {
     ...options,
     method,
     headers,
-    credentials: "include",
-    cache: options.cache || "no-store",
+    credentials: "same-origin",
+    cache: "no-store",
   });
 }
 
 export async function apiJson(path, options = {}) {
   const response = await apiRequest(path, options);
-  const data = await readResponse(response);
+  const raw = await response.text();
+  let data = {};
 
-  if (!response.ok) {
-    if (response.status === 403 && data.rawResponse) {
+  if (raw) {
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      const title = raw.match(/<title[^>]*>(.*?)<\/title>/i)?.[1];
       throw new Error(
-        "Django odrzucił żądanie (403). Sprawdź token CSRF, cookie i konfigurację proxy."
+        title
+          ? `Serwer zwrócił HTML zamiast JSON: ${title} (HTTP ${response.status}).`
+          : `Serwer zwrócił nieprawidłową odpowiedź (HTTP ${response.status}).`
       );
     }
+  }
+
+  if (!response.ok) {
     throw new Error(data.error || `Błąd serwera (${response.status}).`);
   }
 

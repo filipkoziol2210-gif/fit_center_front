@@ -3,6 +3,7 @@ import logo from "../ikonka.png";
 import { apiJson, jsonBody } from "../api";
 
 function RegisterPage({ changePage, setLoggedInUser }) {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -11,7 +12,7 @@ function RegisterPage({ changePage, setLoggedInUser }) {
 
   async function register(event) {
     event.preventDefault();
-    setError("");
+    if (isSubmitting) return;
 
     if (password !== confirmPassword) {
       setError("Hasła nie są takie same.");
@@ -22,25 +23,26 @@ function RegisterPage({ changePage, setLoggedInUser }) {
       return;
     }
 
+    setError("");
     setIsSubmitting(true);
-    const normalizedEmail = email.trim().toLowerCase();
 
     try {
+      const normalizedEmail = email.trim().toLowerCase();
       const data = await apiJson("/api/register/", {
         method: "POST",
-        ...jsonBody({ email: normalizedEmail, password }),
+        ...jsonBody({ name: name.trim(), email: normalizedEmail, password }),
       });
 
       if (!data.success) {
-        throw new Error(data.error || "Nie udało się utworzyć konta.");
+        throw new Error(data.error || "Rejestracja nie powiodła się.");
       }
 
-      // Backend tworzy sesję od razu po rejestracji.
-      setLoggedInUser(normalizedEmail);
+      // Backend api_register tworzy sesję zaraz po utworzeniu konta.
+      setLoggedInUser?.(normalizedEmail);
       changePage("home");
     } catch (err) {
       console.error("REGISTER ERROR:", err);
-      setError(err.message || "Nie udało się połączyć z serwerem.");
+      setError(err.message || "Nie udało się utworzyć konta.");
     } finally {
       setIsSubmitting(false);
     }
@@ -57,6 +59,18 @@ function RegisterPage({ changePage, setLoggedInUser }) {
         </p>
 
         <form onSubmit={register}>
+          <div className="input-group">
+            <label htmlFor="register-name">Imię</label>
+            <input
+              id="register-name"
+              type="text"
+              placeholder="Wpisz swoje imię"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              required
+            />
+          </div>
+
           <div className="input-group">
             <label htmlFor="register-email">Adres e-mail</label>
             <input
@@ -75,7 +89,7 @@ function RegisterPage({ changePage, setLoggedInUser }) {
             <input
               id="register-password"
               type="password"
-              placeholder="Minimum 8 znaków"
+              placeholder="Wpisz hasło (min. 8 znaków)"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               autoComplete="new-password"

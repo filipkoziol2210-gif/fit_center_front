@@ -1,8 +1,3 @@
 {
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "https://fit-center-u3un.onrender.com/api/:path*"
-    }
-  ]
+  "$schema": "https://openapi.vercel.sh/vercel.json"
 }

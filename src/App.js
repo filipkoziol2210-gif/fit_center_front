@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./App.css";
 
 import DietPage from "./pages/DietPage";
@@ -19,33 +19,12 @@ function App() {
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [authError, setAuthError] = useState("");
 
-  // Odtwórz stan zalogowania z cookie sesji po odświeżeniu strony.
-  useEffect(() => {
-    let active = true;
-
-    apiJson("/api/session/")
-      .then((data) => {
-        if (active && data.authenticated) {
-          setLoggedInUser(data.email);
-        }
-      })
-      .catch((error) => {
-        // Błąd pobierania sesji nie powinien blokować publicznej strony głównej.
-        console.warn("SESSION CHECK:", error.message);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
   function changeTheme(mode) {
     setDarkMode(mode === "dark");
   }
 
   function changePage(newPage) {
     setPage(newPage);
-    setAuthError("");
     window.scrollTo(0, 0);
   }
 
@@ -55,6 +34,7 @@ function App() {
     try {
       await apiJson("/api/logout/", { method: "POST" });
       setLoggedInUser(null);
+      localStorage.removeItem("userId");
       changePage("home");
     } catch (error) {
       console.error("LOGOUT ERROR:", error);

@@ -10,6 +10,8 @@ function LoginPage({ changePage, setLoggedInUser }) {
 
   async function handleLogin(event) {
     event.preventDefault();
+    if (isSubmitting) return;
+
     setError("");
     setIsSubmitting(true);
 
@@ -21,14 +23,14 @@ function LoginPage({ changePage, setLoggedInUser }) {
       });
 
       if (!data.success) {
-        throw new Error(data.error || "Nie udało się zalogować.");
+        throw new Error(data.error || "Logowanie nie powiodło się.");
       }
 
       setLoggedInUser(normalizedEmail);
       changePage("home");
     } catch (err) {
       console.error("LOGIN ERROR:", err);
-      setError(err.message || "Nie udało się połączyć z serwerem.");
+      setError(err.message || "Nie udało się zalogować.");
     } finally {
       setIsSubmitting(false);
     }
@@ -76,7 +78,7 @@ function LoginPage({ changePage, setLoggedInUser }) {
               <input type="checkbox" />
               Zapamiętaj mnie
             </label>
-            <button type="button" className="forgot-password" disabled>
+            <button type="button" className="forgot-password">
               Nie pamiętasz hasła?
             </button>
           </div>
@@ -98,7 +100,7 @@ function LoginPage({ changePage, setLoggedInUser }) {
           <span></span>
         </div>
 
-        <button type="button" className="google-login" disabled>
+        <button type="button" className="google-login">
           <span className="google-logo">G</span>
           Kontynuuj z Google
         </button>
