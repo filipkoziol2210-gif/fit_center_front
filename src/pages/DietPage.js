@@ -1,7 +1,7 @@
 function DietPage({ changePage }) {
 
   return (
-    <main className="subpage">
+    <main className="diet-page">
 
       <button
         className="page-back"
@@ -10,70 +10,80 @@ function DietPage({ changePage }) {
         ← Strona główna
       </button>
 
-
-      <div className="subpage-title">
-
-        <div className="subpage-icon">
-          🥗
+      <div className="diet-heading">
+        <div>
+          <span className="diet-eyebrow">FIT CENTER / TWOJA DIETA</span>
+          <h1>Strefa żywienia</h1>
+          <p>
+            Zarządzaj posiłkami i sprawdzaj informacje
+            o swoim odżywianiu.
+          </p>
         </div>
 
-        <div>
-          <h1>Dieta</h1>
+        <div className="diet-heading-icon">🥗</div>
+      </div>
 
+      <div className="diet-menu">
+
+        <div className="diet-menu-card calories-card">
+          <div className="diet-card-top">
+            <span className="diet-card-icon">🔥</span>
+            <span className="diet-card-number">01</span>
+          </div>
+
+          <h2>Kalorie</h2>
           <p>
-            Kontroluj swoją dietę i dzienne spożycie.
+            Dodawaj produkty i sprawdzaj ich wartość
+            energetyczną.
           </p>
+
+          <button onClick={() => changePage("calories")}>
+            Otwórz bilans <span>→</span>
+          </button>
+        </div>
+
+        <div className="diet-menu-card meals-card">
+          <div className="diet-card-top">
+            <span className="diet-card-icon">🍽️</span>
+            <span className="diet-card-number">02</span>
+          </div>
+
+          <h2>Posiłki</h2>
+          <p>
+            Twórz dziennik posiłków i zapisuj to,
+            co zostało zjedzone.
+          </p>
+
+          <button onClick={() => changePage("meals")}>
+            Otwórz dziennik <span>→</span>
+          </button>
+        </div>
+
+        <div className="diet-menu-card macros-card">
+          <div className="diet-card-top">
+            <span className="diet-card-icon">⚖️</span>
+            <span className="diet-card-number">03</span>
+          </div>
+
+          <h2>Makroskładniki</h2>
+          <p>
+            Sprawdzaj ilość białka, tłuszczów
+            i węglowodanów.
+          </p>
+
+          <button onClick={() => changePage("macros")}>
+            Otwórz makro <span>→</span>
+          </button>
         </div>
 
       </div>
 
-
-      <div className="dashboard-grid">
-
-        <div className="dashboard-box">
-
-          <span>🔥</span>
-
-          <h3>Kalorie</h3>
-
-          <p>
-            Sprawdzaj dzienne spożycie kalorii.
-          </p>
-
-          <button>Zobacz kalorie</button>
-
-        </div>
-
-
-        <div className="dashboard-box">
-
-          <span>🍽️</span>
-
-          <h3>Posiłki</h3>
-
-          <p>
-            Dodawaj i przeglądaj swoje posiłki.
-          </p>
-
-          <button>Zobacz posiłki</button>
-
-        </div>
-
-
-        <div className="dashboard-box">
-
-          <span>🥩</span>
-
-          <h3>Makroskładniki</h3>
-
-          <p>
-            Kontroluj białko, tłuszcze i węglowodany.
-          </p>
-
-          <button>Zobacz makro</button>
-
-        </div>
-
+      <div className="diet-bottom-note">
+        <span>💡</span>
+        <p>
+          Twoje dane żywieniowe będą mogły być później
+          zapisywane na koncie po podłączeniu bazy danych.
+        </p>
       </div>
 
     </main>
