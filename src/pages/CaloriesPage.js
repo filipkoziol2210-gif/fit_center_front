@@ -4,6 +4,10 @@ import { apiJson, jsonBody } from "../api";
 export default function CaloriesPage({ changePage }) {
   const [product, setProduct] = useState("");
   const [calories, setCalories] = useState("");
+  const [protein, setProtein] = useState("0");
+  const [carbs, setCarbs] = useState("0");
+  const [fat, setFat] = useState("0");
+  const [weight, setWeight] = useState("100");
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -49,7 +53,7 @@ export default function CaloriesPage({ changePage }) {
     try {
       const data = await apiJson("/api/calories/", {
         method: "POST",
-        ...jsonBody({ name: trimmedProduct, calories: calorieValue }),
+        ...jsonBody({ name: trimmedProduct, calories: calorieValue, protein: Number(protein), carbs: Number(carbs), fat: Number(fat), weight_grams: Number(weight) }),
       });
 
       if (!data.success || data.id == null) {
@@ -58,10 +62,14 @@ export default function CaloriesPage({ changePage }) {
 
       setItems((previous) => [
         ...previous,
-        { id: data.id, name: trimmedProduct, calories: calorieValue },
+        { id: data.id, name: trimmedProduct, calories: Number(data.calories), protein: Number(data.protein), carbs: Number(data.carbs), fat: Number(data.fat), weight_grams: Number(weight) },
       ]);
       setProduct("");
       setCalories("");
+      setProtein("0");
+      setCarbs("0");
+      setFat("0");
+      setWeight("100");
     } catch (err) {
       setError(err.message || "Nie udało się dodać produktu.");
     } finally {
@@ -147,6 +155,21 @@ export default function CaloriesPage({ changePage }) {
                 <span>kcal</span>
               </div>
 
+              <label htmlFor="product-protein">Białko na 100 g</label>
+              <input id="product-protein" type="number" min="0" step="0.1" value={protein} onChange={(event) => setProtein(event.target.value)} required />
+
+              <label htmlFor="product-carbs">Węglowodany na 100 g</label>
+              <input id="product-carbs" type="number" min="0" step="0.1" value={carbs} onChange={(event) => setCarbs(event.target.value)} required />
+
+              <label htmlFor="product-fat">Tłuszcze na 100 g</label>
+              <input id="product-fat" type="number" min="0" step="0.1" value={fat} onChange={(event) => setFat(event.target.value)} required />
+
+              <label htmlFor="product-weight">Spożyta ilość</label>
+              <div className="nutrition-input-with-unit">
+                <input id="product-weight" type="number" min="1" step="1" value={weight} onChange={(event) => setWeight(event.target.value)} required />
+                <span>g</span>
+              </div>
+
               <button className="nutrition-primary-button" type="submit" disabled={saving}>
                 {saving ? "Dodawanie..." : <>Dodaj do listy <span>＋</span></>}
               </button>
@@ -178,7 +201,7 @@ export default function CaloriesPage({ changePage }) {
                     <div className="product-avatar">🍽️</div>
                     <div className="product-details">
                       <strong>{item.name}</strong>
-                      <span>Produkt spożywczy</span>
+                      <span>{item.weight_grams || 100} g · B: {Math.round(Number(item.protein) || 0)} g · W: {Math.round(Number(item.carbs) || 0)} g · T: {Math.round(Number(item.fat) || 0)} g</span>
                     </div>
                     <strong className="product-calories">
                       {Math.round(Number(item.calories) || 0)} kcal
