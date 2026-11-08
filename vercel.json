@@ -1,3 +1,10 @@
+
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json"
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://fit-center-u3un.onrender.com/api/:path*"
+    }
+  ]
 }
