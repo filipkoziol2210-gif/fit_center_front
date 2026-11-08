@@ -1,4 +1,4 @@
-﻿const { proxyToDjango } = require("../lib/djangoProxy");
+const { proxyToDjango } = require("../lib/djangoProxy");
 
 module.exports = async function handler(req, res) {
   return proxyToDjango(req, res);
