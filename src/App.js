@@ -62,6 +62,17 @@ function App() {
       {page === "diet" && (
         <DietPage changePage={changePage} />
       )}
+       {page === "calories" && (
+  <CaloriesPage changePage={changePage} />
+)}
+
+{page === "meals" && (
+  <MealsPage changePage={changePage} />
+)}
+
+{page === "macros" && (
+  <MacrosPage changePage={changePage} />
+)}
 
       {page === "training" && (
         <TrainingPage changePage={changePage} />
