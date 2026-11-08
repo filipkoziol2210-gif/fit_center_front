@@ -6,8 +6,28 @@
       "destination": "/api/proxy?_proxyPath=csrf"
     },
     {
-      "source": "/api/csrf",
-      "destination": "/api/proxy?_proxyPath=csrf"
+      "source": "/api/login/",
+      "destination": "/api/proxy?_proxyPath=login"
+    },
+    {
+      "source": "/api/logout/",
+      "destination": "/api/proxy?_proxyPath=logout"
+    },
+    {
+      "source": "/api/register/",
+      "destination": "/api/proxy?_proxyPath=register"
+    },
+    {
+      "source": "/api/calories/",
+      "destination": "/api/proxy?_proxyPath=calories"
+    },
+    {
+      "source": "/api/macros/",
+      "destination": "/api/proxy?_proxyPath=macros"
+    },
+    {
+      "source": "/api/meals/",
+      "destination": "/api/proxy?_proxyPath=meals"
     }
   ]
 }
