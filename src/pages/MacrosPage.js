@@ -5,6 +5,7 @@ export default function MacrosPage({ changePage }) {
   const [protein, setProtein] = useState("0");
   const [fat, setFat] = useState("0");
   const [carbs, setCarbs] = useState("0");
+  const [consumed, setConsumed] = useState({ protein: 0, fat: 0, carbs: 0, calories: 0 });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -22,6 +23,7 @@ export default function MacrosPage({ changePage }) {
           setProtein(String(data.protein ?? 0));
           setFat(String(data.fat ?? 0));
           setCarbs(String(data.carbs ?? 0));
+          setConsumed({ protein: Number(data.consumedProtein) || 0, fat: Number(data.consumedFat) || 0, carbs: Number(data.consumedCarbs) || 0, calories: Number(data.consumedCalories) || 0 });
         }
       } catch (err) {
         if (!cancelled) setError(err.message || "Nie udało się pobrać celów makro.");
@@ -121,6 +123,14 @@ export default function MacrosPage({ changePage }) {
 
         {error && <p className="nutrition-error" role="alert">{error}</p>}
         {message && <p className="nutrition-success" role="status">{message}</p>}
+
+        <section className="macros-overview">
+          <div>
+            <span className="nutrition-eyebrow">DZISIEJSZE SPOŻYCIE</span>
+            <h2>{Math.round(consumed.calories).toLocaleString("pl-PL")} kcal</h2>
+            <p>Białko: {consumed.protein.toFixed(1)} g · Tłuszcze: {consumed.fat.toFixed(1)} g · Węglowodany: {consumed.carbs.toFixed(1)} g</p>
+          </div>
+        </section>
 
         <section className="macros-layout">
           <form className="nutrition-panel macros-form-panel" onSubmit={saveMacros}>
