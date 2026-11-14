@@ -3015,4 +3015,857 @@ main {
     flex-direction: column;
   }
 }
+/* =========================================
+   FIT CENTER - PODSTRONY TRENINGU
+========================================= */
+
+/* KOLORY */
+
+.app.dark .traininghub-page,
+.app.dark .traininghub-subpage {
+  --th-panel: #171c27;
+  --th-panel-secondary: #111722;
+  --th-border: #2c3442;
+  --th-text: #f5f7fb;
+  --th-muted: #9ca3af;
+  --th-green: #4ade80;
+  --th-green-hover: #22c55e;
+}
+
+.app.light .traininghub-page,
+.app.light .traininghub-subpage {
+  --th-panel: #ffffff;
+  --th-panel-secondary: #f5f7f9;
+  --th-border: #dedfe3;
+  --th-text: #202938;
+  --th-muted: #687386;
+  --th-green: #20bd69;
+  --th-green-hover: #16a65b;
+}
+
+/* GŁÓWNY UKŁAD */
+
+.traininghub-page,
+.traininghub-subpage {
+  width: min(1100px, calc(100% - 50px));
+  margin: 0 auto;
+  padding: 40px 0 90px;
+  text-align: left;
+  color: var(--th-text);
+}
+
+.traininghub-page *,
+.traininghub-subpage * {
+  box-sizing: border-box;
+}
+
+.traininghub-back {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--th-green);
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.traininghub-back:hover {
+  color: var(--th-green-hover);
+  transform: translateX(-3px);
+}
+
+/* NAGŁÓWEK */
+
+.traininghub-heading {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  margin: 45px 0 45px;
+}
+
+.traininghub-heading-icon {
+  width: 76px;
+  height: 76px;
+  flex: 0 0 76px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  background: #42d982;
+  font-size: 36px;
+}
+
+.traininghub-heading-icon.plan-icon {
+  background: #65a8ed;
+}
+
+.traininghub-heading-icon.exercises-icon {
+  background: #42d982;
+}
+
+.traininghub-heading-icon.history-icon {
+  background: #aa8be5;
+}
+
+.traininghub-eyebrow {
+  display: block;
+  margin-bottom: 9px;
+  color: var(--th-green);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.traininghub-heading h1 {
+  margin: 0 0 8px;
+  color: var(--th-text);
+  font-size: 38px;
+  line-height: 1.2;
+  letter-spacing: -1px;
+}
+
+.traininghub-heading p {
+  margin: 0;
+  color: var(--th-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* KARTY GŁÓWNEJ STRONY */
+
+.traininghub-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 25px;
+}
+
+.traininghub-card {
+  min-height: 285px;
+  display: flex;
+  flex-direction: column;
+  padding: 27px;
+  border: 1px solid var(--th-border);
+  border-radius: 18px;
+  background: var(--th-panel);
+  transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.traininghub-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(66, 217, 130, 0.55);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
+.traininghub-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.traininghub-card-icon {
+  font-size: 36px;
+}
+
+.traininghub-card-number {
+  color: #7e8ca1;
+  font-size: 13px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.traininghub-card h2 {
+  margin: 0 0 12px;
+  color: var(--th-text);
+  font-size: 20px;
+}
+
+.traininghub-card p {
+  flex: 1;
+  margin: 0 0 25px;
+  color: var(--th-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.traininghub-button {
+  min-height: 41px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 0 17px;
+  border: none;
+  border-radius: 9px;
+  background: var(--th-green);
+  color: #102016;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.traininghub-button:hover {
+  background: var(--th-green-hover);
+  transform: translateY(-2px);
+}
+
+.traininghub-button span {
+  font-size: 17px;
+}
+
+.traininghub-note {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 25px;
+  padding: 16px 19px;
+  border: 1px solid var(--th-border);
+  border-radius: 12px;
+  background: var(--th-panel);
+}
+
+.traininghub-note > span {
+  color: var(--th-green);
+  font-size: 19px;
+  font-weight: bold;
+}
+
+.traininghub-note p {
+  margin: 0;
+  color: var(--th-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* PODSUMOWANIA */
+
+.traininghub-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 25px;
+  margin-bottom: 23px;
+  padding: 25px 28px;
+  border: 1px solid rgba(66, 217, 130, 0.25);
+  border-radius: 17px;
+  background:
+    radial-gradient(
+      circle at 85% 20%,
+      rgba(66, 217, 130, 0.14),
+      transparent 35%
+    ),
+    var(--th-panel);
+}
+
+.traininghub-summary h2 {
+  margin: 0 0 7px;
+  color: var(--th-text);
+  font-size: 21px;
+}
+
+.traininghub-summary p {
+  margin: 0;
+  color: var(--th-muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.traininghub-summary-number {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  white-space: nowrap;
+}
+
+.traininghub-summary-number strong {
+  color: var(--th-green);
+  font-size: 35px;
+}
+
+.traininghub-summary-number span {
+  color: var(--th-muted);
+  font-size: 11px;
+}
+
+/* PANELE */
+
+.traininghub-panel {
+  min-width: 0;
+  padding: 25px;
+  border: 1px solid var(--th-border);
+  border-radius: 17px;
+  background: var(--th-panel);
+}
+
+.traininghub-panel-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 24px;
+}
+
+.traininghub-panel-heading > div {
+  min-width: 0;
+}
+
+.traininghub-panel-heading h2 {
+  margin: 0 0 5px;
+  color: var(--th-text);
+  font-size: 17px;
+}
+
+.traininghub-panel-heading p {
+  margin: 0;
+  color: var(--th-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.traininghub-panel-icon {
+  width: 43px;
+  height: 43px;
+  flex: 0 0 43px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: rgba(66, 217, 130, 0.13);
+  color: var(--th-green);
+  font-size: 22px;
+}
+
+.traininghub-count {
+  min-width: 28px;
+  height: 28px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;
+  padding: 0 8px;
+  border-radius: 8px;
+  background: rgba(66, 217, 130, 0.12);
+  color: var(--th-green);
+  font-size: 12px;
+  font-weight: bold;
+}
+
+/* UKŁAD DWÓCH PANELI */
+
+.traininghub-workspace {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  align-items: start;
+  gap: 22px;
+}
+
+/* FORMULARZE */
+
+.traininghub-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.traininghub-form label {
+  margin-top: 4px;
+  color: var(--th-text);
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.traininghub-form input,
+.traininghub-form select,
+.traininghub-form textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--th-border);
+  border-radius: 9px;
+  outline: none;
+  background: var(--th-panel-secondary);
+  color: var(--th-text);
+  font-family: inherit;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.traininghub-form input,
+.traininghub-form select {
+  height: 44px;
+  padding: 0 13px;
+}
+
+.traininghub-form textarea {
+  min-height: 85px;
+  padding: 12px 13px;
+  resize: vertical;
+}
+
+.traininghub-form input::placeholder,
+.traininghub-form textarea::placeholder {
+  color: #768397;
+}
+
+.traininghub-form input:focus,
+.traininghub-form select:focus,
+.traininghub-form textarea:focus {
+  border-color: var(--th-green);
+  box-shadow: 0 0 0 3px rgba(66, 217, 130, 0.1);
+}
+
+.traininghub-form .traininghub-button {
+  margin-top: 13px;
+}
+
+/* PUSTE LISTY */
+
+.traininghub-empty {
+  min-height: 230px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+  border: 1px dashed var(--th-border);
+  border-radius: 13px;
+  text-align: center;
+}
+
+.traininghub-empty > span {
+  margin-bottom: 12px;
+  font-size: 37px;
+}
+
+.traininghub-empty h3 {
+  margin: 0 0 7px;
+  color: var(--th-text);
+  font-size: 15px;
+}
+
+.traininghub-empty p {
+  margin: 0;
+  color: var(--th-muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* USUWANIE */
+
+.traininghub-delete {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--th-border);
+  border-radius: 8px;
+  background: transparent;
+  color: #ef7777;
+  font-size: 21px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.traininghub-delete:hover {
+  border-color: rgba(239, 119, 119, 0.5);
+  background: rgba(239, 119, 119, 0.1);
+}
+
+/* PLAN TYGODNIA */
+
+.traininghub-plan-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.traininghub-day-group {
+  padding: 15px 0;
+  border-bottom: 1px solid var(--th-border);
+}
+
+.traininghub-day-group:first-child {
+  padding-top: 0;
+}
+
+.traininghub-day-group:last-child {
+  border-bottom: none;
+}
+
+.traininghub-day-group h3 {
+  margin: 0 0 12px;
+  color: var(--th-green);
+  font-size: 14px;
+}
+
+.traininghub-plan-entry {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 9px;
+  padding: 13px;
+  border: 1px solid var(--th-border);
+  border-radius: 10px;
+  background: var(--th-panel-secondary);
+}
+
+.traininghub-entry-content {
+  min-width: 0;
+}
+
+.traininghub-entry-content strong {
+  color: var(--th-text);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.traininghub-entry-content p {
+  margin: 5px 0 0;
+  color: var(--th-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+/* ĆWICZENIA */
+
+.exercises-library {
+  margin-bottom: 28px;
+}
+
+.exercise-form-main {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 15px;
+}
+
+.exercise-form-numbers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-top: 6px;
+}
+
+.exercise-form-main > div,
+.exercise-form-numbers > div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.traininghub-exercise-results {
+  margin-top: 25px;
+}
+
+.traininghub-results-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 17px;
+}
+
+.traininghub-results-heading h2 {
+  margin: 0;
+  color: var(--th-text);
+  font-size: 20px;
+}
+
+.traininghub-results-heading > span {
+  color: var(--th-muted);
+  font-size: 12px;
+}
+
+.traininghub-exercise-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 17px;
+}
+
+.traininghub-exercise-card {
+  min-width: 0;
+  padding: 21px;
+  border: 1px solid var(--th-border);
+  border-radius: 15px;
+  background: var(--th-panel);
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.traininghub-exercise-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(66, 217, 130, 0.5);
+}
+
+.traininghub-exercise-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.traininghub-exercise-symbol {
+  font-size: 27px;
+}
+
+.traininghub-category {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: rgba(66, 217, 130, 0.12);
+  color: var(--th-green);
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.traininghub-exercise-card h3 {
+  margin: 0 0 19px;
+  color: var(--th-text);
+  font-size: 17px;
+  overflow-wrap: anywhere;
+}
+
+.traininghub-exercise-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.traininghub-exercise-stats > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 11px;
+  border-radius: 9px;
+  background: var(--th-panel-secondary);
+}
+
+.traininghub-exercise-stats strong {
+  color: var(--th-text);
+  font-size: 19px;
+}
+
+.traininghub-exercise-stats span {
+  color: var(--th-muted);
+  font-size: 11px;
+}
+
+/* HISTORIA TRENINGÓW */
+
+.traininghub-history-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 23px;
+}
+
+.traininghub-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 17px;
+  padding: 23px;
+  border: 1px solid var(--th-border);
+  border-radius: 15px;
+  background: var(--th-panel);
+}
+
+.traininghub-stat-icon {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 13px;
+  background: rgba(66, 217, 130, 0.12);
+  font-size: 23px;
+}
+
+.traininghub-stat-card > div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.traininghub-stat-card > div span {
+  color: var(--th-muted);
+  font-size: 12px;
+}
+
+.traininghub-stat-card strong {
+  color: var(--th-text);
+  font-size: 24px;
+}
+
+.history-workspace {
+  grid-template-columns: 0.85fr 1.15fr;
+}
+
+.traininghub-input-unit {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.traininghub-input-unit input {
+  padding-right: 55px;
+}
+
+.traininghub-input-unit > span {
+  position: absolute;
+  right: 14px;
+  color: var(--th-muted);
+  font-size: 12px;
+  pointer-events: none;
+}
+
+.traininghub-history-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.traininghub-history-entry {
+  display: grid;
+  grid-template-columns: 105px minmax(0, 1fr) 30px;
+  align-items: start;
+  gap: 12px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--th-border);
+}
+
+.traininghub-history-entry:first-child {
+  padding-top: 0;
+}
+
+.traininghub-history-entry:last-child {
+  border-bottom: none;
+}
+
+.traininghub-history-date {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--th-muted);
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.traininghub-history-date span {
+  font-size: 20px;
+}
+
+.traininghub-history-content {
+  min-width: 0;
+}
+
+.traininghub-history-content > strong {
+  display: block;
+  color: var(--th-text);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.traininghub-history-content p {
+  margin: 6px 0;
+  color: var(--th-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.traininghub-duration {
+  display: inline-block;
+  margin-top: 8px;
+  color: var(--th-green);
+  font-size: 11px;
+  font-weight: bold;
+}
+
+/* RESPONSYWNOŚĆ */
+
+@media (max-width: 900px) {
+  .traininghub-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .traininghub-workspace,
+  .history-workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .traininghub-exercise-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 550px) {
+  .traininghub-page,
+  .traininghub-subpage {
+    width: calc(100% - 30px);
+    padding: 25px 0 60px;
+  }
+
+  .traininghub-heading {
+    gap: 14px;
+    margin: 35px 0 29px;
+  }
+
+  .traininghub-heading-icon {
+    width: 59px;
+    height: 59px;
+    flex-basis: 59px;
+    border-radius: 15px;
+    font-size: 27px;
+  }
+
+  .traininghub-heading h1 {
+    font-size: 27px;
+  }
+
+  .traininghub-heading p {
+    font-size: 12px;
+  }
+
+  .traininghub-grid,
+  .traininghub-exercise-grid,
+  .traininghub-history-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .traininghub-card {
+    min-height: 245px;
+    padding: 23px;
+  }
+
+  .traininghub-summary {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 21px;
+  }
+
+  .traininghub-summary-number {
+    align-items: flex-start;
+  }
+
+  .traininghub-panel {
+    padding: 19px;
+  }
+
+  .exercise-form-main,
+  .exercise-form-numbers {
+    grid-template-columns: 1fr;
+  }
+
+  .traininghub-history-entry {
+    grid-template-columns: 75px minmax(0, 1fr) 30px;
+    gap: 8px;
+  }
+
+  .traininghub-note {
+    align-items: flex-start;
+  }
+}
 
