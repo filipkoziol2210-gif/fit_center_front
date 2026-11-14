@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import "./App.css";
 
@@ -10,6 +11,11 @@ import CaloriesPage from "./pages/CaloriesPage";
 import MealsPage from "./pages/MealsPage";
 import MacrosPage from "./pages/MacrosPage";
 import BMIPage from "./pages/BMIPage";
+
+import TrainingPlanPage from "./pages/TrainingPlanPage";
+import ExercisesPage from "./pages/ExercisesPage";
+import TrainingHistoryPage from "./pages/TrainingHistoryPage";
+
 import Header from "./components/Header";
 import { apiJson } from "./api";
 
@@ -64,14 +70,51 @@ function App() {
         />
       )}
 
-      {page === "bmi" && <BMIPage changePage={changePage} />}
-      {page === "diet" && <DietPage changePage={changePage} />}
-      {page === "calories" && <CaloriesPage changePage={changePage} />}
-      {page === "meals" && <MealsPage changePage={changePage} />}
-      {page === "macros" && <MacrosPage changePage={changePage} />}
-      {page === "training" && <TrainingPage changePage={changePage} />}
-      {page === "progress" && <ProgressPage changePage={changePage} />}
+      {/* BMI */}
+      {page === "bmi" && (
+        <BMIPage changePage={changePage} />
+      )}
 
+      {/* DIETA */}
+      {page === "diet" && (
+        <DietPage changePage={changePage} />
+      )}
+
+      {page === "calories" && (
+        <CaloriesPage changePage={changePage} />
+      )}
+
+      {page === "meals" && (
+        <MealsPage changePage={changePage} />
+      )}
+
+      {page === "macros" && (
+        <MacrosPage changePage={changePage} />
+      )}
+
+      {/* TRENING */}
+      {page === "training" && (
+        <TrainingPage changePage={changePage} />
+      )}
+
+      {page === "trainingPlan" && (
+        <TrainingPlanPage changePage={changePage} />
+      )}
+
+      {page === "exercises" && (
+        <ExercisesPage changePage={changePage} />
+      )}
+
+      {page === "trainingHistory" && (
+        <TrainingHistoryPage changePage={changePage} />
+      )}
+
+      {/* POSTĘPY */}
+      {page === "progress" && (
+        <ProgressPage changePage={changePage} />
+      )}
+
+      {/* LOGOWANIE */}
       {page === "login" && (
         <LoginPage
           changePage={changePage}
@@ -79,6 +122,7 @@ function App() {
         />
       )}
 
+      {/* REJESTRACJA */}
       {page === "register" && (
         <RegisterPage
           changePage={changePage}
@@ -88,6 +132,11 @@ function App() {
     </div>
   );
 }
+
+
+/* =========================
+   STRONA GŁÓWNA
+========================= */
 
 function HomePage({ changePage, loggedInUser, handleLogout }) {
   return (
@@ -99,35 +148,50 @@ function HomePage({ changePage, loggedInUser, handleLogout }) {
         </div>
 
         <div className="cards">
+
+          {/* DIETA */}
           <div className="card">
             <div className="icon">🥗</div>
             <h2>Dieta</h2>
             <p>Kalorie</p>
             <p>Posiłki</p>
             <p>Makroskładniki</p>
-            <button onClick={() => changePage("diet")}>Otwórz</button>
+
+            <button onClick={() => changePage("diet")}>
+              Otwórz
+            </button>
           </div>
 
+          {/* TRENING */}
           <div className="card">
             <div className="icon">🏋️</div>
             <h2>Trening</h2>
             <p>Plan treningowy</p>
             <p>Ćwiczenia</p>
             <p>Historia treningów</p>
-            <button onClick={() => changePage("training")}>Otwórz</button>
+
+            <button onClick={() => changePage("training")}>
+              Otwórz
+            </button>
           </div>
 
+          {/* POSTĘPY */}
           <div className="card">
             <div className="icon">📈</div>
             <h2>Postępy</h2>
             <p>Waga</p>
             <p>Rekordy</p>
             <p>Wykresy postępów</p>
-            <button onClick={() => changePage("progress")}>Otwórz</button>
+
+            <button onClick={() => changePage("progress")}>
+              Otwórz
+            </button>
           </div>
+
         </div>
       </main>
 
+      {/* LOGOWANIE I WYLOGOWYWANIE */}
       {loggedInUser ? (
         <div
           style={{
@@ -141,6 +205,7 @@ function HomePage({ changePage, loggedInUser, handleLogout }) {
           }}
         >
           <span>Witaj, {loggedInUser}</span>
+
           <button
             className="login"
             onClick={handleLogout}
@@ -150,7 +215,10 @@ function HomePage({ changePage, loggedInUser, handleLogout }) {
           </button>
         </div>
       ) : (
-        <button className="login" onClick={() => changePage("login")}>
+        <button
+          className="login"
+          onClick={() => changePage("login")}
+        >
           👤
           <span>Zaloguj</span>
         </button>
