@@ -1,83 +1,93 @@
-function TrainingPage({ changePage }) {
+export default function TrainingPage({ changePage }) {
+  const sections = [
+    {
+      number: "01",
+      icon: "📋",
+      title: "Plan treningowy",
+      description: "Twórz własny plan i rozplanuj treningi na cały tydzień.",
+      button: "Otwórz plan",
+      page: "trainingPlan",
+    },
+    {
+      number: "02",
+      icon: "💪",
+      title: "Ćwiczenia",
+      description: "Dodawaj ćwiczenia, kategorie, serie i powtórzenia.",
+      button: "Zobacz ćwiczenia",
+      page: "exercises",
+    },
+    {
+      number: "03",
+      icon: "🕒",
+      title: "Historia treningów",
+      description: "Zapisuj wykonane treningi i przeglądaj wcześniejsze sesje.",
+      button: "Otwórz historię",
+      page: "trainingHistory",
+    },
+  ];
 
   return (
-    <main className="subpage">
+    <main className="traininghub-page">
+      <div className="traininghub-container">
+        <button
+          className="traininghub-back"
+          onClick={() => changePage("home")}
+        >
+          ← Strona główna
+        </button>
 
-      <button
-        className="page-back"
-        onClick={() => changePage("home")}
-      >
-        ← Strona główna
-      </button>
+        <div className="traininghub-heading">
+          <div className="traininghub-heading-icon">🏋️</div>
 
+          <div>
+            <span className="traininghub-eyebrow">
+              FIT CENTER / TWOJ TRENING
+            </span>
 
-      <div className="subpage-title">
+            <h1>Trening</h1>
 
-        <div className="subpage-icon">
-          🏋️
+            <p>
+              Twórz swoje treningi, zapisuj ćwiczenia i kontroluj aktywność.
+            </p>
+          </div>
         </div>
 
-        <div>
-          <h1>Trening</h1>
+        <section className="traininghub-grid">
+          {sections.map((section) => (
+            <article className="traininghub-card" key={section.page}>
+              <div className="traininghub-card-top">
+                <span className="traininghub-card-icon">
+                  {section.icon}
+                </span>
 
+                <span className="traininghub-card-number">
+                  {section.number}
+                </span>
+              </div>
+
+              <h2>{section.title}</h2>
+
+              <p>{section.description}</p>
+
+              <button
+                className="traininghub-button"
+                onClick={() => changePage(section.page)}
+              >
+                {section.button}
+                <span>→</span>
+              </button>
+            </article>
+          ))}
+        </section>
+
+        <div className="traininghub-note">
+          <span>ⓘ</span>
           <p>
-            Twórz swoje treningi i zapisuj wyniki.
+            Twoje plany i wyniki będą mogły być zapisywane na koncie
+            po podłączeniu bazy danych.
           </p>
         </div>
-
       </div>
-
-
-      <div className="dashboard-grid">
-
-        <div className="dashboard-box">
-
-          <span>📋</span>
-
-          <h3>Plan treningowy</h3>
-
-          <p>
-            Stwórz własny plan treningowy.
-          </p>
-
-          <button>Otwórz plan</button>
-
-        </div>
-
-
-        <div className="dashboard-box">
-
-          <span>💪</span>
-
-          <h3>Ćwiczenia</h3>
-
-          <p>
-            Dodawaj ćwiczenia, serie i powtórzenia.
-          </p>
-
-          <button>Ćwiczenia</button>
-
-        </div>
-
-
-        <div className="dashboard-box">
-
-          <span>🕒</span>
-
-          <h3>Historia</h3>
-
-          <p>
-            Przeglądaj swoje poprzednie treningi.
-          </p>
-
-          <button>Historia treningów</button>
-
-        </div>
-
-      </div>
-
     </main>
   );
 }
-
-export default TrainingPage;
