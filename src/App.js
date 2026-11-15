@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./App.css";
 
 import DietPage from "./pages/DietPage";
@@ -21,7 +21,27 @@ function App() {
   const [darkMode, setDarkMode] = useState(true);
   const [page, setPage] = useState("home");
   const [loggedInUser, setLoggedInUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const [authError, setAuthError] = useState("");
+
+  // Odtwórz stan logowania z trwałego cookie sesji po każdym uruchomieniu aplikacji.
+  useEffect(() => {
+    let active = true;
+    apiJson("/api/session/")
+      .then(data => {
+        if (!active) return;
+        setLoggedInUser(data.authenticated ? data.email : null);
+      })
+      .catch(error => {
+        if (!active) return;
+        console.error("SESSION RESTORE ERROR:", error);
+        setAuthError("Nie udało się sprawdzić sesji. Odśwież stronę.");
+      })
+      .finally(() => {
+        if (active) setAuthLoading(false);
+      });
+    return () => { active = false; };
+  }, []);
 
   function changeTheme(mode) {
     setDarkMode(mode === "dark");
@@ -38,7 +58,6 @@ function App() {
     try {
       await apiJson("/api/logout/", { method: "POST" });
       setLoggedInUser(null);
-      localStorage.removeItem("userId");
       changePage("home");
     } catch (error) {
       console.error("LOGOUT ERROR:", error);
@@ -64,6 +83,7 @@ function App() {
         <HomePage
           changePage={changePage}
           loggedInUser={loggedInUser}
+          authLoading={authLoading}
           handleLogout={handleLogout}
         />
       )}
@@ -128,7 +148,7 @@ function App() {
    STRONA GŁÓWNA
 ========================= */
 
-function HomePage({ changePage, loggedInUser, handleLogout }) {
+function HomePage({ changePage, loggedInUser, authLoading, handleLogout }) {
   return (
     <>
       <main>
@@ -181,7 +201,9 @@ function HomePage({ changePage, loggedInUser, handleLogout }) {
       </main>
 
       {/* LOGOWANIE I WYLOGOWYWANIE */}
-      {loggedInUser ? (
+      {authLoading ? (
+        <div className="session-status" role="status">Sprawdzanie sesji...</div>
+      ) : loggedInUser ? (
         <div
           style={{
             position: "fixed",
