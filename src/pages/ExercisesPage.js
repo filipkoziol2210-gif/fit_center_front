@@ -1,212 +1,72 @@
-import { useState } from "react";
+
+import { useEffect, useMemo, useState } from "react";
+import { apiJson } from "../api";
 
 export default function ExercisesPage({ changePage }) {
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState("Siłowe");
-  const [sets, setSets] = useState("3");
-  const [reps, setReps] = useState("10");
   const [exercises, setExercises] = useState([]);
+  const [search, setSearch] = useState("");
+  const [muscle, setMuscle] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const categories = [
-    "Siłowe",
-    "Kondycyjne",
-    "Mobilność",
-    "Inne",
-  ];
+  useEffect(() => {
+    let active = true;
+    apiJson("/api/exercises/")
+      .then((data) => { if (active) setExercises(Array.isArray(data.exercises) ? data.exercises : []); })
+      .catch((err) => active && setError(err.message || "Nie udało się pobrać ćwiczeń."))
+      .finally(() => active && setLoading(false));
+    return () => { active = false; };
+  }, []);
 
-  function addExercise(e) {
-    e.preventDefault();
+  const muscles = useMemo(
+    () => [...new Set(exercises.map((item) => item.target_muscle).filter(Boolean))].sort((a, b) => a.localeCompare(b, "pl")),
+    [exercises]
+  );
 
-    if (
-      !name.trim() ||
-      Number(sets) < 1 ||
-      Number(reps) < 1
-    ) {
-      return;
-    }
-
-    setExercises([
-      ...exercises,
-      {
-        id: Date.now(),
-        name: name.trim(),
-        category,
-        sets: Number(sets),
-        reps: Number(reps),
-      },
-    ]);
-
-    setName("");
-    setSets("3");
-    setReps("10");
-  }
-
-  function removeExercise(id) {
-    setExercises(
-      exercises.filter((exercise) => exercise.id !== id)
-    );
-  }
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return exercises.filter((item) => {
+      const text = [item.name, item.target_muscle, item.equipment_type].filter(Boolean).join(" ").toLowerCase();
+      return (!q || text.includes(q)) && (muscle === "all" || item.target_muscle === muscle);
+    });
+  }, [exercises, search, muscle]);
 
   return (
     <main className="traininghub-subpage">
       <div className="traininghub-container">
-        <button
-          className="traininghub-back"
-          onClick={() => changePage("training")}
-        >
-          ← Powrót do treningu
-        </button>
-
+        <button className="traininghub-back" onClick={() => changePage("training")}>← Powrót do treningu</button>
         <div className="traininghub-heading">
           <div className="traininghub-heading-icon exercises-icon">💪</div>
-
-          <div>
-            <span className="traininghub-eyebrow">BAZA AKTYWNOŚCI</span>
-            <h1>Ćwiczenia</h1>
-            <p>Twórz własną listę ćwiczeń i zapisuj ich parametry.</p>
-          </div>
+          <div><span className="traininghub-eyebrow">BAZA AKTYWNOŚCI</span><h1>Ćwiczenia</h1><p>Biblioteka pobierana bezpośrednio z backendu.</p></div>
         </div>
-
+        {error && <p className="nutrition-error" role="alert">{error}</p>}
         <section className="traininghub-summary exercises-summary">
-          <div>
-            <span className="traininghub-eyebrow">TWOJA BIBLIOTEKA</span>
-            <h2>Lista ćwiczeń</h2>
-            <p>Wszystkie dodane pozycje w jednym miejscu.</p>
-          </div>
-
-          <div className="traininghub-summary-number">
-            <strong>{exercises.length}</strong>
-            <span>dodanych ćwiczeń</span>
-          </div>
+          <div><span className="traininghub-eyebrow">BIBLIOTEKA</span><h2>Ćwiczenia dostępne w systemie</h2><p>Te identyfikatory są używane również przy zapisie serii treningowych.</p></div>
+          <div className="traininghub-summary-number"><strong>{filtered.length}</strong><span>pasujących ćwiczeń</span></div>
         </section>
-
         <section className="traininghub-panel exercises-library">
-          <div className="traininghub-panel-heading">
-            <span className="traininghub-panel-icon">＋</span>
-            <div>
-              <h2>Dodaj ćwiczenie</h2>
-              <p>Wprowadź nazwę i podstawowe parametry.</p>
-            </div>
-          </div>
-
-          <form className="traininghub-form exercise-form" onSubmit={addExercise}>
+          <div className="traininghub-form exercise-form">
             <div className="exercise-form-main">
-              <div>
-                <label htmlFor="exercise-name">Nazwa ćwiczenia</label>
-                <input
-                  id="exercise-name"
-                  type="text"
-                  placeholder="Np. Pompki"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div>
-                <label htmlFor="exercise-category">Kategoria</label>
-                <select
-                  id="exercise-category"
-                  value={category}
-                  onChange={(e) => setCategory(e.target.value)}
-                >
-                  {categories.map((item) => (
-                    <option key={item} value={item}>
-                      {item}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <div><label htmlFor="exercise-search">Szukaj</label><input id="exercise-search" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Np. wyciskanie" /></div>
+              <div><label htmlFor="exercise-muscle">Partia mięśniowa</label><select id="exercise-muscle" value={muscle} onChange={(e) => setMuscle(e.target.value)}><option value="all">Wszystkie</option>{muscles.map((item) => <option key={item} value={item}>{item}</option>)}</select></div>
             </div>
-
-            <div className="exercise-form-numbers">
-              <div>
-                <label htmlFor="exercise-sets">Serie</label>
-                <input
-                  id="exercise-sets"
-                  type="number"
-                  min="1"
-                  step="1"
-                  value={sets}
-                  onChange={(e) => setSets(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div>
-                <label htmlFor="exercise-reps">Powtórzenia</label>
-                <input
-                  id="exercise-reps"
-                  type="number"
-                  min="1"
-                  step="1"
-                  value={reps}
-                  onChange={(e) => setReps(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
-
-            <button className="traininghub-button" type="submit">
-              Dodaj ćwiczenie <span>＋</span>
-            </button>
-          </form>
-        </section>
-
-        <section className="traininghub-exercise-results">
-          <div className="traininghub-results-heading">
-            <h2>Twoje ćwiczenia</h2>
-            <span>{exercises.length} pozycji</span>
           </div>
-
-          {exercises.length === 0 ? (
-            <div className="traininghub-empty">
-              <span>🏋️</span>
-              <h3>Nie masz jeszcze ćwiczeń</h3>
-              <p>Dodaj pierwszą pozycję do swojej biblioteki.</p>
-            </div>
-          ) : (
-            <div className="traininghub-exercise-grid">
-              {exercises.map((exercise) => (
-                <article
-                  className="traininghub-exercise-card"
-                  key={exercise.id}
-                >
-                  <div className="traininghub-exercise-top">
-                    <span className="traininghub-exercise-symbol">💪</span>
-
-                    <button
-                      className="traininghub-delete"
-                      onClick={() => removeExercise(exercise.id)}
-                      title="Usuń ćwiczenie"
-                      aria-label={`Usuń ${exercise.name}`}
-                    >
-                      ×
-                    </button>
-                  </div>
-
-                  <span className="traininghub-category">
-                    {exercise.category}
-                  </span>
-
-                  <h3>{exercise.name}</h3>
-
-                  <div className="traininghub-exercise-stats">
-                    <div>
-                      <strong>{exercise.sets}</strong>
-                      <span>Serie</span>
-                    </div>
-
-                    <div>
-                      <strong>{exercise.reps}</strong>
-                      <span>Powtórzenia</span>
-                    </div>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
         </section>
+        {loading ? <div className="traininghub-empty"><h3>Ładowanie ćwiczeń...</h3></div> :
+          filtered.length === 0 ? <div className="traininghub-empty"><h3>Brak pasujących ćwiczeń</h3></div> :
+          <section className="traininghub-exercise-grid">
+            {filtered.map((exercise) => (
+              <article className="traininghub-exercise-card" key={exercise.id}>
+                <div className="traininghub-exercise-top"><span className="traininghub-exercise-symbol">💪</span></div>
+                <span className="traininghub-category">{exercise.target_muscle || "Bez kategorii"}</span>
+                <h3>{exercise.name}</h3>
+                <div className="traininghub-exercise-stats">
+                  <div><strong>{exercise.equipment_type || "—"}</strong><span>Sprzęt</span></div>
+                  <div><strong>#{exercise.id}</strong><span>ID</span></div>
+                </div>
+              </article>
+            ))}
+          </section>}
       </div>
     </main>
   );
