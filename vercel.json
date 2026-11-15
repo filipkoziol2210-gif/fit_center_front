@@ -28,6 +28,34 @@
     {
       "source": "/api/meals/",
       "destination": "/api/proxy?_proxyPath=meals"
+    },
+    {
+      "source": "/api/foods/",
+      "destination": "/api/proxy?_proxyPath=foods"
+    },
+    {
+      "source": "/api/body-measurements/",
+      "destination": "/api/proxy?_proxyPath=body-measurements"
+    },
+    {
+      "source": "/api/workouts/",
+      "destination": "/api/proxy?_proxyPath=workouts"
+    },
+    {
+      "source": "/api/workout-sets/",
+      "destination": "/api/proxy?_proxyPath=workout-sets"
+    },
+    {
+      "source": "/api/exercises/",
+      "destination": "/api/proxy?_proxyPath=exercises"
+    },
+    {
+      "source": "/api/profile/",
+      "destination": "/api/proxy?_proxyPath=profile"
+    },
+    {
+      "source": "/api/session/",
+      "destination": "/api/proxy?_proxyPath=session"
     }
   ]
 }
