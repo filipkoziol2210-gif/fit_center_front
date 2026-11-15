@@ -1,93 +1,132 @@
+import { useEffect, useState } from "react";
+import { apiJson, jsonBody } from "../api";
+
+const localNow = () => {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 16);
+};
+
 export default function TrainingPage({ changePage }) {
-  const sections = [
-    {
-      number: "01",
-      icon: "📋",
-      title: "Plan treningowy",
-      description: "Twórz własny plan i rozplanuj treningi na cały tydzień.",
-      button: "Otwórz plan",
-      page: "trainingPlan",
-    },
-    {
-      number: "02",
-      icon: "💪",
-      title: "Ćwiczenia",
-      description: "Dodawaj ćwiczenia, kategorie, serie i powtórzenia.",
-      button: "Zobacz ćwiczenia",
-      page: "exercises",
-    },
-    {
-      number: "03",
-      icon: "🕒",
-      title: "Historia treningów",
-      description: "Zapisuj wykonane treningi i przeglądaj wcześniejsze sesje.",
-      button: "Otwórz historię",
-      page: "trainingHistory",
-    },
-  ];
+  const [exercises, setExercises] = useState([]);
+  const [routines, setRoutines] = useState([]);
+  const [routineId, setRoutineId] = useState("");
+  const [name, setName] = useState("Trening");
+  const [start, setStart] = useState(localNow());
+  const [notes, setNotes] = useState("");
+  const [items, setItems] = useState([]);
+  const [error, setError] = useState("");
+  const [saving, setSaving] = useState(false);
 
-  return (
-    <main className="traininghub-page">
-      <div className="traininghub-container">
-        <button
-          className="traininghub-back"
-          onClick={() => changePage("home")}
-        >
-          ← Strona główna
-        </button>
+  useEffect(() => {
+    Promise.all([apiJson("/api/exercises/"), apiJson("/api/routines/")])
+      .then(([e, r]) => { setExercises(e.exercises || []); setRoutines(r.routines || []); })
+      .catch(e => setError(e.message || "Nie udało się pobrać danych treningowych."));
+  }, []);
 
-        <div className="traininghub-heading">
-          <div className="traininghub-heading-icon">🏋️</div>
+  const addExercise = (id, sets = 1, reps = 10) => {
+    const e = exercises.find(x => String(x.id) === String(id));
+    if (!e || items.some(x => x.exercise_id === e.id)) return;
+    setItems(old => [...old, {
+      exercise_id: e.id, exercise_name: e.name, target_muscle: e.target_muscle,
+      sets: Array.from({ length: sets }, (_, i) => ({ id: Date.now() + i, reps: String(reps), weight: "", rpe: "" }))
+    }]);
+  };
 
-          <div>
-            <span className="traininghub-eyebrow">
-              FIT CENTER / TWOJ TRENING
-            </span>
+  const useRoutine = id => {
+    setRoutineId(id);
+    const r = routines.find(x => String(x.id) === String(id));
+    if (!r) return;
+    setName(r.name);
+    setItems(r.exercises.map(e => ({
+      exercise_id: e.exercise_id, exercise_name: e.exercise_name, target_muscle: e.target_muscle,
+      sets: Array.from({ length: Number(e.target_sets) }, (_, i) => ({ id: Date.now() + e.exercise_id + i, reps: String(e.target_reps), weight: "", rpe: "" }))
+    })));
+  };
 
-            <h1>Trening</h1>
+  const updateSet = (eid, index, field, value) => setItems(old => old.map(e => e.exercise_id !== eid ? e : ({
+    ...e, sets: e.sets.map((s, i) => i === index ? { ...s, [field]: value } : s)
+  })));
 
-            <p>
-              Twórz swoje treningi, zapisuj ćwiczenia i kontroluj aktywność.
-            </p>
-          </div>
-        </div>
+  const addSet = eid => setItems(old => old.map(e => {
+    if (e.exercise_id !== eid) return e;
+    const p = e.sets[e.sets.length - 1] || {};
+    return { ...e, sets: [...e.sets, { id: Date.now(), reps: p.reps || "10", weight: p.weight || "", rpe: p.rpe || "" }] };
+  }));
 
-        <section className="traininghub-grid">
-          {sections.map((section) => (
-            <article className="traininghub-card" key={section.page}>
-              <div className="traininghub-card-top">
-                <span className="traininghub-card-icon">
-                  {section.icon}
-                </span>
+  const removeSet = (eid, index) => setItems(old => old.map(e => {
+    if (e.exercise_id !== eid || e.sets.length === 1) return e;
+    return { ...e, sets: e.sets.filter((_, i) => i !== index) };
+  }));
 
-                <span className="traininghub-card-number">
-                  {section.number}
-                </span>
-              </div>
+  async function save(e) {
+    e.preventDefault();
+    const sets = items.flatMap(ex => ex.sets.map((s, i) => ({
+      exercise_id: ex.exercise_id, set_order: i + 1, reps: Number(s.reps),
+      weight: s.weight === "" ? null : Number(s.weight),
+      rpe: s.rpe === "" ? null : Number(s.rpe)
+    })));
+    if (!name.trim()) return setError("Podaj nazwę treningu.");
+    if (!sets.length) return setError("Dodaj ćwiczenie i serię.");
+    if (sets.some(s => !Number.isFinite(s.reps) || s.reps < 1)) return setError("Powtórzenia muszą być dodatnie.");
+    setSaving(true); setError("");
+    try {
+      await apiJson("/api/workouts/", { method: "POST", ...jsonBody({
+        name: name.trim(), start_time: start, end_time: localNow(), notes: notes.trim(), routine_id: routineId || null, sets
+      })});
+      changePage("trainingHistory");
+    } catch (err) { setError(err.message || "Nie udało się zapisać treningu."); }
+    finally { setSaving(false); }
+  }
 
-              <h2>{section.title}</h2>
+  return <main className="traininghub-subpage"><div className="traininghub-container">
+    <button className="traininghub-back" onClick={() => changePage("home")}>← Strona główna</button>
+    <div className="traininghub-heading"><div className="traininghub-heading-icon">🏋️</div><div>
+      <span className="traininghub-eyebrow">FIT CENTER / TRENING</span><h1>Zapisz trening</h1>
+      <p>Loguj serię po serii, wybierając ćwiczenia wyłącznie z bazy danych.</p>
+    </div></div>
+    {error && <p className="nutrition-error" role="alert">{error}</p>}
 
-              <p>{section.description}</p>
+    <form onSubmit={save}>
+      <section className="traininghub-summary plan-summary"><div>
+        <span className="traininghub-eyebrow">NOWA SESJA</span><h2>{name}</h2>
+        <p>{items.length} ćwiczeń · {items.reduce((n, e) => n + e.sets.length, 0)} serii</p>
+      </div><div className="traininghub-summary-actions">
+        <button type="button" className="traininghub-button secondary" onClick={() => changePage("trainingPlan")}>Rutyny</button>
+        <button className="traininghub-button" type="submit" disabled={saving}>{saving ? "Zapisywanie..." : "Zakończ i zapisz"}</button>
+      </div></section>
 
-              <button
-                className="traininghub-button"
-                onClick={() => changePage(section.page)}
-              >
-                {section.button}
-                <span>→</span>
-              </button>
-            </article>
-          ))}
-        </section>
+      <section className="traininghub-panel" style={{ marginBottom: 20 }}><div className="traininghub-panel-heading">
+        <span className="traininghub-panel-icon">＋</span><div><h2>Sesja</h2><p>Możesz rozpocząć pusty trening albo użyć gotowej rutyny.</p></div>
+      </div><div className="traininghub-form">
+        <label>Nazwa treningu</label><input value={name} onChange={e => setName(e.target.value)} />
+        <label>Rutyna</label><select value={routineId} onChange={e => useRoutine(e.target.value)}>
+          <option value="">Trening pusty</option>{routines.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
+        </select>
+        <label>Rozpoczęcie</label><input type="datetime-local" value={start} onChange={e => setStart(e.target.value)} />
+        <label>Notatka</label><textarea rows="2" value={notes} onChange={e => setNotes(e.target.value)} />
+      </div></section>
 
-        <div className="traininghub-note">
-          <span>ⓘ</span>
-          <p>
-            Historia treningów i serie są zapisywane na koncie przez backend.
-            Plan tygodniowy jest przechowywany lokalnie w przeglądarce.
-          </p>
-        </div>
-      </div>
-    </main>
-  );
+      <section className="traininghub-panel" style={{ marginBottom: 20 }}><div className="traininghub-panel-heading">
+        <span className="traininghub-panel-icon">＋</span><div><h2>Dodaj ćwiczenie</h2><p>Lista pochodzi bezpośrednio z tabeli exercises.</p></div>
+      </div><select value="" onChange={e => e.target.value && addExercise(e.target.value)}>
+        <option value="">Wybierz ćwiczenie</option>{exercises.map(x => <option key={x.id} value={x.id}>{x.name} · {x.target_muscle || "—"}</option>)}
+      </select></section>
+
+      <section className="traininghub-workspace">{items.length ? items.map(ex => <div className="traininghub-panel" key={ex.exercise_id}>
+        <div className="traininghub-panel-heading"><span className="traininghub-panel-icon">💪</span><div><h2>{ex.exercise_name}</h2><p>{ex.target_muscle || "—"}</p></div></div>
+        <div style={{ overflowX: "auto" }}><table style={{ width: "100%", borderCollapse: "collapse" }}><thead><tr>
+          <th>SET</th><th>POPRZEDNIO</th><th>CIĘŻAR KG</th><th>POWT.</th><th>RPE</th><th></th>
+        </tr></thead><tbody>{ex.sets.map((s, i) => <tr key={s.id}>
+          <td>{i + 1}</td><td style={{ opacity: .5 }}>—</td>
+          <td><input type="number" min="0" step="0.5" value={s.weight} onChange={e => updateSet(ex.exercise_id, i, "weight", e.target.value)} /></td>
+          <td><input type="number" min="1" value={s.reps} onChange={e => updateSet(ex.exercise_id, i, "reps", e.target.value)} /></td>
+          <td><input type="number" min="0" max="10" step="0.5" value={s.rpe} onChange={e => updateSet(ex.exercise_id, i, "rpe", e.target.value)} /></td>
+          <td><button type="button" className="traininghub-delete" onClick={() => removeSet(ex.exercise_id, i)}>×</button></td>
+        </tr>)}</tbody></table></div>
+        <button type="button" className="traininghub-button secondary" onClick={() => addSet(ex.exercise_id)} style={{ marginTop: 12 }}>＋ Dodaj serię</button>
+      </div>) : <div className="traininghub-panel traininghub-empty"><h3>Trening jest pusty</h3><p>Dodaj pierwsze ćwiczenie z katalogu.</p></div>}</section>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}><button className="traininghub-button" type="submit" disabled={saving}>{saving ? "Zapisywanie..." : "Zakończ trening i zapisz"}</button></div>
+    </form>
+  </div></main>;
 }
