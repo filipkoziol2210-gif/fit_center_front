@@ -10,8 +10,6 @@ const localNow = () => {
 
 export default function TrainingPage({ changePage }) {
   const [exercises, setExercises] = useState([]);
-  const [routines, setRoutines] = useState([]);
-  const [routineId, setRoutineId] = useState("");
   const [name, setName] = useState("Trening");
   const [start, setStart] = useState(localNow());
   const [notes, setNotes] = useState("");
@@ -21,8 +19,8 @@ export default function TrainingPage({ changePage }) {
   const [activeTab, setActiveTab] = useState("new");
 
   useEffect(() => {
-    Promise.all([apiJson("/api/exercises/"), apiJson("/api/routines/")])
-      .then(([e, r]) => { setExercises(e.exercises || []); setRoutines(r.routines || []); })
+    apiJson("/api/exercises/")
+      .then(e => { setExercises(e.exercises || []); })
       .catch(e => setError(e.message || "Nie udało się pobrać danych treningowych."));
   }, []);
 
@@ -33,17 +31,6 @@ export default function TrainingPage({ changePage }) {
       exercise_id: e.id, exercise_name: e.name, target_muscle: e.target_muscle,
       sets: Array.from({ length: sets }, (_, i) => ({ id: Date.now() + i, reps: String(reps), weight: "", rpe: "" }))
     }]);
-  };
-
-  const applyRoutine = id => {
-    setRoutineId(id);
-    const r = routines.find(x => String(x.id) === String(id));
-    if (!r) return;
-    setName(r.name);
-    setItems(r.exercises.map(e => ({
-      exercise_id: e.exercise_id, exercise_name: e.exercise_name, target_muscle: e.target_muscle,
-      sets: Array.from({ length: Number(e.target_sets) }, (_, i) => ({ id: Date.now() + e.exercise_id + i, reps: String(e.target_reps), weight: "", rpe: "" }))
-    })));
   };
 
   const updateSet = (eid, index, field, value) => setItems(old => old.map(e => e.exercise_id !== eid ? e : ({
@@ -74,7 +61,7 @@ export default function TrainingPage({ changePage }) {
     setSaving(true); setError("");
     try {
       await apiJson("/api/workouts/", { method: "POST", ...jsonBody({
-        name: name.trim(), start_time: start, end_time: localNow(), notes: notes.trim(), routine_id: routineId || null, sets
+        name: name.trim(), start_time: start, end_time: localNow(), notes: notes.trim(), sets
       })});
       setActiveTab("history");
     } catch (err) { setError(err.message || "Nie udało się zapisać treningu."); }
@@ -91,7 +78,6 @@ export default function TrainingPage({ changePage }) {
 
     <nav className="traininghub-navigation" aria-label="Sekcje treningu">
       <button type="button" className="traininghub-nav-link active" onClick={() => setActiveTab("new")}>Trening</button>
-      <button type="button" className="traininghub-nav-link" onClick={() => changePage("trainingPlan")}>Plany treningowe</button>
       <button type="button" className="traininghub-nav-link" onClick={() => changePage("exercises")}>Ćwiczenia</button>
     </nav>
     <div className="traininghub-tabs" role="tablist" aria-label="Widok treningu">
@@ -104,17 +90,13 @@ export default function TrainingPage({ changePage }) {
         <span className="traininghub-eyebrow">NOWA SESJA</span><h2>{name}</h2>
         <p>{items.length} ćwiczeń · {items.reduce((n, e) => n + e.sets.length, 0)} serii</p>
       </div><div className="traininghub-summary-actions">
-        <button type="button" className="traininghub-button secondary" onClick={() => changePage("trainingPlan")}>Rutyny</button>
         <button className="traininghub-button" type="submit" disabled={saving}>{saving ? "Zapisywanie..." : "Zakończ i zapisz"}</button>
       </div></section>
 
       <section className="traininghub-panel" style={{ marginBottom: 20 }}><div className="traininghub-panel-heading">
-        <span className="traininghub-panel-icon">＋</span><div><h2>Sesja</h2><p>Możesz rozpocząć pusty trening albo użyć gotowej rutyny.</p></div>
+        <span className="traininghub-panel-icon">＋</span><div><h2>Sesja</h2><p>Ustaw nazwę, datę i notatkę dla tej sesji.</p></div>
       </div><div className="traininghub-form">
         <label>Nazwa treningu</label><input value={name} onChange={e => setName(e.target.value)} />
-        <label>Rutyna</label><select value={routineId} onChange={e => applyRoutine(e.target.value)}>
-          <option value="">Trening pusty</option>{routines.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
-        </select>
         <label>Rozpoczęcie</label><input type="datetime-local" value={start} onChange={e => setStart(e.target.value)} />
         <label>Notatka</label><textarea rows="2" value={notes} onChange={e => setNotes(e.target.value)} />
       </div></section>
