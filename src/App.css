@@ -3943,3 +3943,240 @@ main {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* =========================================
+   STABILIZACJA UKŁADU TRENINGU
+   ========================================= */
+
+/* Globalne style main/header nie mogą wpływać na moduł treningowy. */
+main.traininghub-subpage {
+  width: min(1100px, calc(100% - 48px));
+  min-height: calc(100vh - 80px);
+  margin: 0 auto;
+  padding: 34px 0 72px;
+  text-align: left;
+}
+
+.traininghub-container {
+  width: 100%;
+  min-width: 0;
+}
+
+.traininghub-subpage *,
+.traininghub-subpage *::before,
+.traininghub-subpage *::after {
+  box-sizing: border-box;
+}
+
+.traininghub-heading,
+.traininghub-summary,
+.traininghub-panel,
+.traininghub-workspace,
+.traininghub-exercise-grid,
+.traininghub-history-view,
+.traininghub-navigation,
+.traininghub-tabs {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.traininghub-heading > div:last-child {
+  min-width: 0;
+}
+
+.traininghub-heading h1,
+.traininghub-heading p,
+.traininghub-summary h2,
+.traininghub-summary p,
+.traininghub-panel-heading h2,
+.traininghub-panel-heading p {
+  overflow-wrap: anywhere;
+}
+
+.traininghub-summary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.traininghub-subpage .traininghub-panel {
+  overflow: hidden;
+}
+
+.traininghub-subpage .traininghub-panel > div[style*="overflow"] {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.traininghub-subpage table {
+  min-width: 620px;
+  color: var(--th-text);
+}
+
+.traininghub-subpage th {
+  padding: 11px 9px;
+  color: var(--th-muted);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .06em;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--th-border);
+}
+
+.traininghub-subpage td {
+  padding: 9px;
+  border-bottom: 1px solid var(--th-border);
+  vertical-align: middle;
+}
+
+.traininghub-subpage td input {
+  width: 100%;
+  min-width: 65px;
+  height: 38px;
+  padding: 0 9px;
+  border: 1px solid var(--th-border);
+  border-radius: 7px;
+  outline: none;
+  background: var(--th-panel-secondary);
+  color: var(--th-text);
+  font: inherit;
+}
+
+.traininghub-subpage td input:focus {
+  border-color: var(--th-green);
+  box-shadow: 0 0 0 3px rgba(66, 217, 130, .1);
+}
+
+/* Klasyczny, natywny w obsłudze, ale dopracowany wizualnie select. */
+.traininghub-subpage select {
+  width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  padding: 0 42px 0 14px;
+  border: 1px solid var(--th-border);
+  border-radius: 9px;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  background-color: var(--th-panel-secondary);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  color: var(--th-text);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: border-color .18s ease, box-shadow .18s ease, background-color .18s ease;
+}
+
+.traininghub-subpage select:hover {
+  border-color: rgba(66, 217, 130, .65);
+}
+
+.traininghub-subpage select:focus {
+  border-color: var(--th-green);
+  box-shadow: 0 0 0 3px rgba(66, 217, 130, .12);
+}
+
+.traininghub-subpage select option {
+  background: var(--th-panel);
+  color: var(--th-text);
+}
+
+.traininghub-form select {
+  height: 46px;
+}
+
+.exercise-form-main > div {
+  min-width: 0;
+}
+
+.exercise-form-main label {
+  line-height: 1.4;
+}
+
+.traininghub-exercise-card {
+  overflow: hidden;
+}
+
+.traininghub-exercise-card h3 {
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+@media (max-width: 760px) {
+  main.traininghub-subpage {
+    width: calc(100% - 36px);
+    padding: 28px 0 56px;
+  }
+
+  .traininghub-workspace,
+  .history-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .traininghub-summary {
+    align-items: flex-start;
+  }
+
+  .traininghub-summary-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .traininghub-summary-actions .traininghub-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .traininghub-history-view .traininghub-history-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  main.traininghub-subpage {
+    width: calc(100% - 28px);
+  }
+
+  .traininghub-heading {
+    align-items: flex-start;
+  }
+
+  .traininghub-heading h1 {
+    font-size: 25px;
+  }
+
+  .traininghub-navigation {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .traininghub-nav-link {
+    min-width: 0;
+    text-align: center;
+  }
+
+  .traininghub-tabs {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .traininghub-history-view .traininghub-history-stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .traininghub-panel {
+    padding: 17px;
+  }
+
+  .traininghub-subpage .traininghub-button {
+    max-width: 100%;
+  }
+}
