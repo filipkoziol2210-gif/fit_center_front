@@ -35,8 +35,8 @@ export default function TrainingHistoryPage({ embedded = false }) {
     {workouts.length === 0 ? <div className="traininghub-empty"><h3>Brak zapisanych treningów</h3><p>Nie ma jeszcze żadnej sesji na koncie.</p></div> :
       <div className="traininghub-history-list">{workouts.map(w => <article className="traininghub-history-entry" key={w.id}>
         <div className="traininghub-history-content"><strong>{w.name}</strong><p>{date(w.start_time)} → {date(w.end_time)}</p><span className="traininghub-duration">{w.exercises?.length || 0} ćwiczeń · {w.total_sets} serii · {Math.round(Number(w.total_volume || 0))} kg</span>{w.notes && <p>{w.notes}</p>}</div>
-        <div style={{ display: "flex", gap: 8 }}><button className="traininghub-button" type="button" onClick={() => setOpen(open === w.id ? null : w.id)}>{open === w.id ? "Zwiń" : "Szczegóły"}</button><button className="traininghub-delete" type="button" onClick={() => remove(w.id)}>×</button></div>
-        {open === w.id && <div style={{ width: "100%", marginTop: 16 }}>{w.exercises?.map(ex => <div className="traininghub-panel" style={{ marginBottom: 10 }} key={ex.exercise_id}>
+        <div className="traininghub-history-actions"><button className="traininghub-button" type="button" onClick={() => setOpen(open === w.id ? null : w.id)}>{open === w.id ? "Zwiń" : "Szczegóły"}</button><button className="traininghub-delete" type="button" onClick={() => remove(w.id)}>×</button></div>
+        {open === w.id && <div className="traininghub-history-details">{w.exercises?.map(ex => <div className="traininghub-history-exercise" key={ex.exercise_id}>
           <strong>{ex.exercise_name}</strong><p>{ex.target_muscle || ""}</p><table style={{ width: "100%", borderCollapse: "collapse" }}><thead><tr><th>SET</th><th>CIĘŻAR</th><th>POWT.</th><th>RPE</th></tr></thead><tbody>
           {ex.sets.map(s => <tr key={s.id}><td>{s.set_order}</td><td>{s.weight == null ? "—" : s.weight + " kg"}</td><td>{s.reps}</td><td>{s.rpe == null ? "—" : s.rpe}</td></tr>)}
           </tbody></table></div>)}</div>}
