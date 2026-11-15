@@ -83,8 +83,8 @@ export default function TrainingPage({ changePage }) {
         <div className="traininghub-note">
           <span>ⓘ</span>
           <p>
-            Twoje plany i wyniki będą mogły być zapisywane na koncie
-            po podłączeniu bazy danych.
+            Historia treningów i serie są zapisywane na koncie przez backend.
+            Plan tygodniowy jest przechowywany lokalnie w przeglądarce.
           </p>
         </div>
       </div>
