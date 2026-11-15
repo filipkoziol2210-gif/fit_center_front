@@ -4180,3 +4180,105 @@ main.traininghub-subpage {
     max-width: 100%;
   }
 }
+
+
+/* Sesja użytkownika */
+.session-status {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  z-index: 1000;
+  padding: 10px 14px;
+  border: 1px solid var(--th-border, #2c3442);
+  border-radius: 9px;
+  background: var(--th-panel, #171c27);
+  color: var(--th-muted, #9ca3af);
+  font-size: 13px;
+}
+
+/* Trening: pełna szerokość kart ćwiczeń i tabela bez poziomego scrolla. */
+.traininghub-workspace {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.traininghub-workspace > .traininghub-panel {
+  width: 100%;
+  min-width: 0;
+}
+
+.traininghub-sets-table-wrap {
+  width: 100%;
+  min-width: 0;
+  overflow: visible;
+}
+
+.traininghub-subpage .traininghub-sets-table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+  border-collapse: collapse;
+}
+
+.traininghub-subpage .traininghub-sets-table th,
+.traininghub-subpage .traininghub-sets-table td {
+  padding: 10px 8px;
+  overflow: hidden;
+}
+
+.traininghub-subpage .traininghub-sets-table th:first-child,
+.traininghub-subpage .traininghub-sets-table td:first-child {
+  width: 10%;
+}
+
+.traininghub-subpage .traininghub-sets-table th:nth-child(2),
+.traininghub-subpage .traininghub-sets-table td:nth-child(2),
+.traininghub-subpage .traininghub-sets-table th:nth-child(3),
+.traininghub-subpage .traininghub-sets-table td:nth-child(3),
+.traininghub-subpage .traininghub-sets-table th:nth-child(4),
+.traininghub-subpage .traininghub-sets-table td:nth-child(4) {
+  width: 24%;
+}
+
+.traininghub-subpage .traininghub-sets-table th:last-child,
+.traininghub-subpage .traininghub-sets-table td:last-child {
+  width: 56px;
+  text-align: center;
+}
+
+.traininghub-subpage .traininghub-sets-table td input {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding: 0 7px;
+  font-size: 14px;
+}
+
+@media (max-width: 520px) {
+  .traininghub-panel:has(.traininghub-sets-table) {
+    padding: 13px 10px;
+  }
+
+  .traininghub-subpage .traininghub-sets-table th,
+  .traininghub-subpage .traininghub-sets-table td {
+    padding: 8px 3px;
+    font-size: 10px;
+  }
+
+  .traininghub-subpage .traininghub-sets-table td input {
+    height: 36px;
+    padding: 0 4px;
+    font-size: 12px;
+  }
+
+  .traininghub-subpage .traininghub-sets-table th:last-child,
+  .traininghub-subpage .traininghub-sets-table td:last-child {
+    width: 38px;
+  }
+
+  .traininghub-subpage .traininghub-sets-table .traininghub-delete {
+    width: 27px;
+    height: 27px;
+  }
+}
