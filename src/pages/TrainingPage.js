@@ -109,10 +109,10 @@ export default function TrainingPage({ changePage }) {
 
       <section className="traininghub-workspace">{items.length ? items.map(ex => <div className="traininghub-panel" key={ex.exercise_id}>
         <div className="traininghub-panel-heading"><span className="traininghub-panel-icon">💪</span><div><h2>{ex.exercise_name}</h2><p>{ex.target_muscle || "—"}</p></div></div>
-        <div style={{ overflowX: "auto" }}><table style={{ width: "100%", borderCollapse: "collapse" }}><thead><tr>
-          <th>SET</th><th>POPRZEDNIO</th><th>CIĘŻAR KG</th><th>POWT.</th><th>RPE</th><th></th>
+        <div className="traininghub-sets-table-wrap"><table className="traininghub-sets-table"><thead><tr>
+          <th>SET</th><th>CIĘŻAR KG</th><th>POWT.</th><th>RPE</th><th></th>
         </tr></thead><tbody>{ex.sets.map((s, i) => <tr key={s.id}>
-          <td>{i + 1}</td><td style={{ opacity: .5 }}>—</td>
+          <td>{i + 1}</td>
           <td><input type="number" min="0" step="0.5" value={s.weight} onChange={e => updateSet(ex.exercise_id, i, "weight", e.target.value)} /></td>
           <td><input type="number" min="1" value={s.reps} onChange={e => updateSet(ex.exercise_id, i, "reps", e.target.value)} /></td>
           <td><input type="number" min="0" max="10" step="0.5" value={s.rpe} onChange={e => updateSet(ex.exercise_id, i, "rpe", e.target.value)} /></td>
