@@ -14,7 +14,6 @@ import BMIPage from "./pages/BMIPage";
 
 import TrainingPlanPage from "./pages/TrainingPlanPage";
 import ExercisesPage from "./pages/ExercisesPage";
-import TrainingHistoryPage from "./pages/TrainingHistoryPage";
 
 import Header from "./components/Header";
 import { apiJson } from "./api";
@@ -105,10 +104,6 @@ function App() {
         <ExercisesPage changePage={changePage} />
       )}
 
-      {page === "trainingHistory" && (
-        <TrainingHistoryPage changePage={changePage} />
-      )}
-
       {/* POSTĘPY */}
       {page === "progress" && (
         <ProgressPage changePage={changePage} />
@@ -166,9 +161,9 @@ function HomePage({ changePage, loggedInUser, handleLogout }) {
           <div className="card">
             <div className="icon">🏋️</div>
             <h2>Trening</h2>
-            <p>Plan treningowy</p>
-            <p>Ćwiczenia</p>
-            <p>Historia treningów</p>
+            <p>Nowy trening i historia</p>
+            <p>Plany treningowe</p>
+            <p>Katalog ćwiczeń</p>
 
             <button onClick={() => changePage("training")}>
               Otwórz
