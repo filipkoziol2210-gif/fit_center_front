@@ -12,7 +12,6 @@ import MealsPage from "./pages/MealsPage";
 import MacrosPage from "./pages/MacrosPage";
 import BMIPage from "./pages/BMIPage";
 
-import TrainingPlanPage from "./pages/TrainingPlanPage";
 import ExercisesPage from "./pages/ExercisesPage";
 
 import Header from "./components/Header";
@@ -96,10 +95,6 @@ function App() {
         <TrainingPage changePage={changePage} />
       )}
 
-      {page === "trainingPlan" && (
-        <TrainingPlanPage changePage={changePage} />
-      )}
-
       {page === "exercises" && (
         <ExercisesPage changePage={changePage} />
       )}
@@ -162,7 +157,6 @@ function HomePage({ changePage, loggedInUser, handleLogout }) {
             <div className="icon">🏋️</div>
             <h2>Trening</h2>
             <p>Nowy trening i historia</p>
-            <p>Plany treningowe</p>
             <p>Katalog ćwiczeń</p>
 
             <button onClick={() => changePage("training")}>
