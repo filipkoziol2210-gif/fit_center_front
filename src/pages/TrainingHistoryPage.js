@@ -34,7 +34,7 @@ export default function TrainingHistoryPage({ embedded = false }) {
     </div>
     {workouts.length === 0 ? <div className="traininghub-empty"><h3>Brak zapisanych treningów</h3><p>Nie ma jeszcze żadnej sesji na koncie.</p></div> :
       <div className="traininghub-history-list">{workouts.map(w => <article className="traininghub-history-entry" key={w.id}>
-        <div className="traininghub-history-content"><strong>{w.name}</strong><p>{date(w.start_time)} → {date(w.end_time)}</p><span className="traininghub-duration">{w.exercises?.length || 0} ćwiczeń · {w.total_sets} serii · {Math.round(Number(w.total_volume || 0))} kg</span>{w.notes && <p>{w.notes}</p>}</div>
+        <div className="traininghub-history-content"><strong>{w.name}</strong><p className="traininghub-history-date-range">{date(w.start_time)} → {date(w.end_time)}</p><span className="traininghub-duration">{w.exercises?.length || 0} ćwiczeń · {w.total_sets} serii · {Math.round(Number(w.total_volume || 0))} kg</span>{w.notes && <p className="traininghub-history-notes">{w.notes}</p>}</div>
         <div className="traininghub-history-actions"><button className="traininghub-button" type="button" onClick={() => setOpen(open === w.id ? null : w.id)}>{open === w.id ? "Zwiń" : "Szczegóły"}</button><button className="traininghub-delete" type="button" onClick={() => remove(w.id)}>×</button></div>
         {open === w.id && <div className="traininghub-history-details">{w.exercises?.map(ex => <div className="traininghub-history-exercise" key={ex.exercise_id}>
           <strong>{ex.exercise_name}</strong><p>{ex.target_muscle || ""}</p><table style={{ width: "100%", borderCollapse: "collapse" }}><thead><tr><th>SET</th><th>CIĘŻAR</th><th>POWT.</th><th>RPE</th></tr></thead><tbody>
