@@ -50,6 +50,10 @@
       "destination": "/api/proxy?_proxyPath=exercises"
     },
     {
+      "source": "/api/routines/",
+      "destination": "/api/proxy?_proxyPath=routines"
+    },
+    {
       "source": "/api/profile/",
       "destination": "/api/proxy?_proxyPath=profile"
     },
