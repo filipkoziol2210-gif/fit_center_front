@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { apiJson, jsonBody } from "../api";
+import TrainingHistoryPage from "./TrainingHistoryPage";
 
 const localNow = () => {
   const d = new Date();
@@ -17,6 +18,7 @@ export default function TrainingPage({ changePage }) {
   const [items, setItems] = useState([]);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState("new");
 
   useEffect(() => {
     Promise.all([apiJson("/api/exercises/"), apiJson("/api/routines/")])
@@ -74,7 +76,7 @@ export default function TrainingPage({ changePage }) {
       await apiJson("/api/workouts/", { method: "POST", ...jsonBody({
         name: name.trim(), start_time: start, end_time: localNow(), notes: notes.trim(), routine_id: routineId || null, sets
       })});
-      changePage("trainingHistory");
+      setActiveTab("history");
     } catch (err) { setError(err.message || "Nie udało się zapisać treningu."); }
     finally { setSaving(false); }
   }
@@ -87,6 +89,16 @@ export default function TrainingPage({ changePage }) {
     </div></div>
     {error && <p className="nutrition-error" role="alert">{error}</p>}
 
+    <nav className="traininghub-navigation" aria-label="Sekcje treningu">
+      <button type="button" className="traininghub-nav-link active" onClick={() => setActiveTab("new")}>Trening</button>
+      <button type="button" className="traininghub-nav-link" onClick={() => changePage("trainingPlan")}>Plany treningowe</button>
+      <button type="button" className="traininghub-nav-link" onClick={() => changePage("exercises")}>Ćwiczenia</button>
+    </nav>
+    <div className="traininghub-tabs" role="tablist" aria-label="Widok treningu">
+      <button type="button" role="tab" aria-selected={activeTab === "new"} className={activeTab === "new" ? "active" : ""} onClick={() => setActiveTab("new")}>＋ Nowy trening</button>
+      <button type="button" role="tab" aria-selected={activeTab === "history"} className={activeTab === "history" ? "active" : ""} onClick={() => setActiveTab("history")}>◷ Historia treningów</button>
+    </div>
+    {activeTab === "history" ? <TrainingHistoryPage embedded /> : (
     <form onSubmit={save}>
       <section className="traininghub-summary plan-summary"><div>
         <span className="traininghub-eyebrow">NOWA SESJA</span><h2>{name}</h2>
@@ -128,5 +140,6 @@ export default function TrainingPage({ changePage }) {
       </div>) : <div className="traininghub-panel traininghub-empty"><h3>Trening jest pusty</h3><p>Dodaj pierwsze ćwiczenie z katalogu.</p></div>}</section>
       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}><button className="traininghub-button" type="submit" disabled={saving}>{saving ? "Zapisywanie..." : "Zakończ trening i zapisz"}</button></div>
     </form>
+    )}
   </div></main>;
 }
