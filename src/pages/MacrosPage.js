@@ -6,6 +6,7 @@ export default function MacrosPage({ changePage }) {
   const [fat, setFat] = useState("0");
   const [carbs, setCarbs] = useState("0");
   const [consumed, setConsumed] = useState({ protein: 0, fat: 0, carbs: 0, calories: 0 });
+  const [targetCalories, setTargetCalories] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -23,6 +24,7 @@ export default function MacrosPage({ changePage }) {
           setProtein(String(data.protein ?? 0));
           setFat(String(data.fat ?? 0));
           setCarbs(String(data.carbs ?? 0));
+          setTargetCalories(Number(data.targetCalories) || 0);
           setConsumed({ protein: Number(data.consumedProtein) || 0, fat: Number(data.consumedFat) || 0, carbs: Number(data.consumedCarbs) || 0, calories: Number(data.consumedCalories) || 0 });
         }
       } catch (err) {
@@ -78,6 +80,7 @@ export default function MacrosPage({ changePage }) {
       });
 
       if (!data.success) throw new Error(data.error || "Serwer nie potwierdził zapisu.");
+      setTargetCalories(Number(data.targetCalories) || Math.round(totalCalories));
       setMessage("Cele makroskładników zostały zapisane.");
     } catch (err) {
       setError(err.message || "Nie udało się zapisać celów makro.");
@@ -113,7 +116,7 @@ export default function MacrosPage({ changePage }) {
           <div>
             <span className="nutrition-eyebrow">ANALIZA CELÓW</span>
             <h2>Energia wynikająca z makro</h2>
-            <p>Wartość jest obliczana na podstawie podanych celów w gramach.</p>
+            <p>Cel zapisany na koncie: {targetCalories.toLocaleString("pl-PL")} kcal. Obliczenie: białko × 4 + tłuszcze × 9 + węglowodany × 4.</p>
           </div>
           <div className="macros-total">
             <strong>{Math.round(totalCalories).toLocaleString("pl-PL")}</strong>
@@ -128,7 +131,8 @@ export default function MacrosPage({ changePage }) {
           <div>
             <span className="nutrition-eyebrow">DZISIEJSZE SPOŻYCIE</span>
             <h2>{Math.round(consumed.calories).toLocaleString("pl-PL")} kcal</h2>
-            <p>Białko: {consumed.protein.toFixed(1)} g · Tłuszcze: {consumed.fat.toFixed(1)} g · Węglowodany: {consumed.carbs.toFixed(1)} g</p>
+            <p>Białko: {consumed.protein.toFixed(1)} / {numericValues.protein || 0} g · Tłuszcze: {consumed.fat.toFixed(1)} / {numericValues.fat || 0} g · Węglowodany: {consumed.carbs.toFixed(1)} / {numericValues.carbs || 0} g</p>
+            <p>Kalorie: {Math.round(consumed.calories).toLocaleString("pl-PL")} / {targetCalories.toLocaleString("pl-PL")} kcal</p>
           </div>
         </section>
 

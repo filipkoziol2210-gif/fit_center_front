@@ -28,6 +28,10 @@
     {
       "source": "/api/meals/",
       "destination": "/api/proxy?_proxyPath=meals"
+    },
+    {
+      "source": "/api/foods/",
+      "destination": "/api/proxy?_proxyPath=foods"
     }
   ]
 }
