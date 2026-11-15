@@ -3,7 +3,7 @@ import { apiJson } from "../api";
 
 const date = v => { const d = new Date(v); return Number.isNaN(d.getTime()) ? v : d.toLocaleString("pl-PL"); };
 
-export default function TrainingHistoryPage({ changePage }) {
+export default function TrainingHistoryPage({ embedded = false }) {
   const [workouts, setWorkouts] = useState([]);
   const [open, setOpen] = useState(null);
   const [error, setError] = useState("");
@@ -19,8 +19,7 @@ export default function TrainingHistoryPage({ changePage }) {
   const sets = workouts.reduce((n, w) => n + Number(w.total_sets || 0), 0);
   const volume = workouts.reduce((n, w) => n + Number(w.total_volume || 0), 0);
 
-  return <main className="traininghub-subpage"><div className="traininghub-container">
-    <button className="traininghub-back" onClick={() => changePage("training")}>← Nowy trening</button>
+  return <section className="traininghub-history-view">
     <div className="traininghub-heading"><div className="traininghub-heading-icon history-icon">🕒</div><div>
       <span className="traininghub-eyebrow">TWOJE SESJE</span><h1>Historia treningów</h1><p>Gotowe sesje są odczytywane z bazy razem z każdą zapisaną serią.</p>
     </div></div>
@@ -43,5 +42,5 @@ export default function TrainingHistoryPage({ changePage }) {
           </tbody></table></div>)}</div>}
       </article>)}</div>}
     </section>
-  </div></main>;
+  </section>;
 }
