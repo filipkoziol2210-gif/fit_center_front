@@ -33,7 +33,7 @@ export default function TrainingPage({ changePage }) {
     }]);
   };
 
-  const useRoutine = id => {
+  const applyRoutine = id => {
     setRoutineId(id);
     const r = routines.find(x => String(x.id) === String(id));
     if (!r) return;
@@ -100,7 +100,7 @@ export default function TrainingPage({ changePage }) {
         <span className="traininghub-panel-icon">＋</span><div><h2>Sesja</h2><p>Możesz rozpocząć pusty trening albo użyć gotowej rutyny.</p></div>
       </div><div className="traininghub-form">
         <label>Nazwa treningu</label><input value={name} onChange={e => setName(e.target.value)} />
-        <label>Rutyna</label><select value={routineId} onChange={e => useRoutine(e.target.value)}>
+        <label>Rutyna</label><select value={routineId} onChange={e => applyRoutine(e.target.value)}>
           <option value="">Trening pusty</option>{routines.map(r => <option key={r.id} value={r.id}>{r.name}</option>)}
         </select>
         <label>Rozpoczęcie</label><input type="datetime-local" value={start} onChange={e => setStart(e.target.value)} />
