@@ -187,10 +187,10 @@ function HomePage({ changePage, loggedInUser, authLoading, handleLogout }) {
           {/* POSTĘPY */}
           <div className="card">
             <div className="icon">📈</div>
-            <h2>Postępy</h2>
+            <h2>Statystyki</h2>
             <p>Waga</p>
             <p>Rekordy</p>
-            <p>Wykresy postępów</p>
+            <p>Wykresy i analiza wyników</p>
 
             <button onClick={() => changePage("progress")}>
               Otwórz
