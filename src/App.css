@@ -4568,9 +4568,9 @@ main.traininghub-subpage {
   letter-spacing: 1.8px;
 }
 
-.progress-kpis {
+ .progress-kpis {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 14px;
   margin-bottom: 18px;
 }
@@ -4780,11 +4780,33 @@ main.traininghub-subpage {
   box-shadow: 0 0 0 3px rgba(74,222,128,.1);
 }
 
-.progress-measure-form .traininghub-button {
+.progress-save-button {
   width: 100%;
-  min-height: 43px;
-  justify-content: center;
-  margin-top: 2px;
+  min-height: 46px;
+  margin-top: 4px;
+  border: 1px solid rgba(74,222,128,.45);
+  border-radius: 10px;
+  background: #4ade80;
+  color: #07110a;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
+  box-shadow: 0 8px 24px rgba(74,222,128,.12);
+}
+
+.progress-save-button:hover:not(:disabled) {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+.progress-save-button:disabled {
+  opacity: .6;
+  cursor: wait;
+}
+
+.progress-kpi-bmi strong {
+  color: #4ade80;
 }
 
 .progress-bar-chart {
@@ -4927,6 +4949,12 @@ main.traininghub-subpage {
 
 .light .progress-measurement-row {
   color: #666;
+}
+
+@media (max-width: 1100px) {
+  .progress-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 900px) {
