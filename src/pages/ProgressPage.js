@@ -78,6 +78,7 @@ function ProgressPage({ changePage }) {
   const [profile, setProfile] = useState(null);
   const [measurementDate, setMeasurementDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [weight, setWeight] = useState("");
+  const [height, setHeight] = useState(() => profile?.height_cm ? String(profile.height_cm) : "");
   const [bodyFat, setBodyFat] = useState("");
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
@@ -90,6 +91,7 @@ function ProgressPage({ changePage }) {
         setMeasurements(measurementData.measurements || []);
         setWorkouts(workoutData.workouts || []);
         setProfile(profileData.profile || null);
+        setHeight(profileData.profile?.height_cm ? String(profileData.profile.height_cm) : "");
       })
       .catch(e => setError(e.message || "Nie udało się pobrać statystyk."))
       .finally(() => setLoading(false));
@@ -139,6 +141,14 @@ function ProgressPage({ changePage }) {
     setError("");
 
     try {
+      if (height !== "") {
+        await apiJson("/api/profile/", {
+          method: "POST",
+          ...jsonBody({ height_cm: Number(height) })
+        });
+        setProfile(current => ({ ...(current || {}), height_cm: Number(height) }));
+      }
+
       const result = await apiJson("/api/body-measurements/", {
         method: "POST",
         ...jsonBody({
@@ -174,7 +184,7 @@ function ProgressPage({ changePage }) {
       <button className="page-back" onClick={() => changePage("home")}>← Strona główna</button>
 
       <div className="progress-heading">
-        <div className="subpage-icon">📊</div>
+        <div className="subpage-icon progress-logo"><img src="/logo192.png" alt="Fit Center" /></div>
         <div>
           <span className="progress-eyebrow">FIT CENTER / ANALITYKA</span>
           <h1>Statystyki</h1>
@@ -205,6 +215,7 @@ function ProgressPage({ changePage }) {
           <div className="progress-panel-heading"><div><span className="progress-section-label">NOWY POMIAR</span><h2>Zapisz wynik</h2><p>Wpis trafia bezpośrednio do bazy.</p></div></div>
           <form className="progress-measure-form" onSubmit={saveMeasurement}>
             <label>Data<input type="date" value={measurementDate} onChange={e => setMeasurementDate(e.target.value)} required /></label>
+            <label>Wzrost (cm)<input type="number" min="1" step="1" value={height} onChange={e => setHeight(e.target.value)} placeholder="np. 186" required /></label>
             <label>Waga (kg)<input type="number" min="0.1" step="0.1" value={weight} onChange={e => setWeight(e.target.value)} placeholder="np. 82.4" required /></label>
             <label>BF (%)<input type="number" min="0" max="100" step="0.1" value={bodyFat} onChange={e => setBodyFat(e.target.value)} placeholder="opcjonalnie" /></label>
             <label>Notatka<textarea rows="2" value={notes} onChange={e => setNotes(e.target.value)} placeholder="np. pomiar rano" /></label>
