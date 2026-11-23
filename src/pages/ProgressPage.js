@@ -75,6 +75,7 @@ function BarChart({ data }) {
 function ProgressPage({ changePage }) {
   const [measurements, setMeasurements] = useState([]);
   const [workouts, setWorkouts] = useState([]);
+  const [profile, setProfile] = useState(null);
   const [measurementDate, setMeasurementDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [weight, setWeight] = useState("");
   const [bodyFat, setBodyFat] = useState("");
@@ -84,10 +85,11 @@ function ProgressPage({ changePage }) {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    Promise.all([apiJson("/api/body-measurements/"), apiJson("/api/workouts/")])
-      .then(([measurementData, workoutData]) => {
+    Promise.all([apiJson("/api/body-measurements/"), apiJson("/api/workouts/"), apiJson("/api/profile/")])
+      .then(([measurementData, workoutData, profileData]) => {
         setMeasurements(measurementData.measurements || []);
         setWorkouts(workoutData.workouts || []);
+        setProfile(profileData.profile || null);
       })
       .catch(e => setError(e.message || "Nie udało się pobrać statystyk."))
       .finally(() => setLoading(false));
@@ -101,6 +103,8 @@ function ProgressPage({ changePage }) {
   const latestWeight = weightHistory.length ? Number(weightHistory[weightHistory.length - 1].weight_kg) : null;
   const previousWeight = weightHistory.length > 1 ? Number(weightHistory[weightHistory.length - 2].weight_kg) : null;
   const weightDelta = latestWeight !== null && previousWeight !== null ? latestWeight - previousWeight : null;
+  const heightCm = Number(profile?.height_cm);
+  const bmi = latestWeight !== null && heightCm > 0 ? latestWeight / Math.pow(heightCm / 100, 2) : null;
   const totalSets = workouts.reduce((sum, workout) => sum + Number(workout.total_sets || 0), 0);
   const totalVolume = workouts.reduce((sum, workout) => sum + Number(workout.total_volume || 0), 0);
 
@@ -185,6 +189,7 @@ function ProgressPage({ changePage }) {
         <div className="progress-kpi"><span>Serie</span><strong>{totalSets}</strong><small>wykonanych serii</small></div>
         <div className="progress-kpi"><span>Objętość</span><strong>{Math.round(totalVolume)} kg</strong><small>łączny ciężar × powtórzenia</small></div>
         <div className="progress-kpi"><span>Aktualna waga</span><strong>{latestWeight === null ? "—" : latestWeight.toFixed(1) + " kg"}</strong><small>{weightDelta === null ? "brak poprzedniego pomiaru" : (weightDelta > 0 ? "+" : "") + weightDelta.toFixed(1) + " kg od poprzedniego"}</small></div>
+        <div className="progress-kpi progress-kpi-bmi"><span>BMI</span><strong>{bmi === null ? "—" : bmi.toFixed(1)}</strong><small>{bmi === null ? "uzupełnij wzrost w profilu" : "na podstawie aktualnej wagi"}</small></div>
       </section>
 
       <div className="progress-layout">
@@ -203,7 +208,7 @@ function ProgressPage({ changePage }) {
             <label>Waga (kg)<input type="number" min="0.1" step="0.1" value={weight} onChange={e => setWeight(e.target.value)} placeholder="np. 82.4" required /></label>
             <label>BF (%)<input type="number" min="0" max="100" step="0.1" value={bodyFat} onChange={e => setBodyFat(e.target.value)} placeholder="opcjonalnie" /></label>
             <label>Notatka<textarea rows="2" value={notes} onChange={e => setNotes(e.target.value)} placeholder="np. pomiar rano" /></label>
-            <button className="traininghub-button" type="submit" disabled={saving}>{saving ? "Zapisywanie..." : "＋ Zapisz pomiar"}</button>
+            <button className="progress-save-button" type="submit" disabled={saving}>{saving ? "Zapisywanie..." : "Zapisz pomiar"}</button>
           </form>
         </section>
 
