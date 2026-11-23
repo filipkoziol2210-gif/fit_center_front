@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { apiJson, jsonBody } from "../api";
+import logo from "../ikonka.png";
 
 const formatDate = value => {
   const date = new Date(value);
@@ -105,8 +106,11 @@ function ProgressPage({ changePage }) {
   const latestWeight = weightHistory.length ? Number(weightHistory[weightHistory.length - 1].weight_kg) : null;
   const previousWeight = weightHistory.length > 1 ? Number(weightHistory[weightHistory.length - 2].weight_kg) : null;
   const weightDelta = latestWeight !== null && previousWeight !== null ? latestWeight - previousWeight : null;
-  const heightCm = Number(profile?.height_cm);
-  const bmi = latestWeight !== null && heightCm > 0 ? latestWeight / Math.pow(heightCm / 100, 2) : null;
+  const bmiWeight = latestWeight !== null ? latestWeight : Number(weight);
+  const bmiHeight = height !== "" ? Number(height) : Number(profile?.height_cm);
+  const bmi = Number.isFinite(bmiWeight) && bmiWeight > 0 && Number.isFinite(bmiHeight) && bmiHeight > 0
+    ? bmiWeight / Math.pow(bmiHeight / 100, 2)
+    : null;
   const totalSets = workouts.reduce((sum, workout) => sum + Number(workout.total_sets || 0), 0);
   const totalVolume = workouts.reduce((sum, workout) => sum + Number(workout.total_volume || 0), 0);
 
@@ -143,7 +147,7 @@ function ProgressPage({ changePage }) {
     try {
       if (height !== "") {
         await apiJson("/api/profile/", {
-          method: "POST",
+          method: "PUT",
           ...jsonBody({ height_cm: Number(height) })
         });
         setProfile(current => ({ ...(current || {}), height_cm: Number(height) }));
@@ -184,7 +188,7 @@ function ProgressPage({ changePage }) {
       <button className="page-back" onClick={() => changePage("home")}>← Strona główna</button>
 
       <div className="progress-heading">
-        <div className="subpage-icon progress-logo"><img src="/logo192.png" alt="Fit Center" /></div>
+        <div className="subpage-icon progress-logo"><img src={logo} alt="Fit Center" /></div>
         <div>
           <span className="progress-eyebrow">FIT CENTER / ANALITYKA</span>
           <h1>Statystyki</h1>
